@@ -6,8 +6,8 @@ interface SessionBadgeProps {
 }
 
 const BADGE_CONFIG: Record<SessionType, { label: string; bg: string; color: string }> = {
-  claude: { label: 'Claude', bg: '#2a1530',  color: '#d070f0' },
-  shell:  { label: 'Shell',  bg: '#2a1608',  color: '#c8903a' },
+  claude: { label: 'Claude', bg: 'var(--claude-accent-bg)',  color: 'var(--claude-accent)' },
+  shell:  { label: 'Shell',  bg: 'var(--card-bg)',  color: 'var(--accent)' },
   unknown: { label: '',      bg: 'transparent', color: 'transparent' },
 };
 

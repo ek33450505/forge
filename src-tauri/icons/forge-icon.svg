@@ -1,0 +1,78 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background: dark rounded square -->
+  <rect width="1024" height="1024" rx="180" fill="#1a1008"/>
+
+  <!-- Anvil body -->
+  <defs>
+    <linearGradient id="anvil-grad" x1="512" y1="500" x2="512" y2="780" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4a4a4a"/>
+      <stop offset="100%" stop-color="#2a2a2a"/>
+    </linearGradient>
+    <linearGradient id="flame-grad" x1="512" y1="120" x2="512" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffd060"/>
+      <stop offset="40%" stop-color="#e8a838"/>
+      <stop offset="100%" stop-color="#c05020"/>
+    </linearGradient>
+    <filter id="flame-glow">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Flame rising from anvil horn -->
+  <path
+    d="M512 120 C512 120 620 230 640 340 C660 440 620 500 580 520 C600 460 580 380 540 320 C520 350 530 430 510 480 C490 430 480 350 470 320 C430 380 410 460 430 520 C390 500 350 440 370 340 C390 230 512 120 512 120Z"
+    fill="url(#flame-grad)"
+    filter="url(#flame-glow)"
+  />
+
+  <!-- Inner flame highlight -->
+  <path
+    d="M512 220 C512 220 570 300 570 380 C570 430 545 470 512 480 C479 470 454 430 454 380 C454 300 512 220 512 220Z"
+    fill="#ffd060"
+    opacity="0.5"
+  />
+
+  <!-- Anvil: flat top surface -->
+  <path
+    d="M280 540 L744 540 L744 580 C744 590 736 600 724 600 L300 600 C288 600 280 590 280 580Z"
+    fill="url(#anvil-grad)"
+  />
+
+  <!-- Anvil: horn (left point) -->
+  <path
+    d="M200 555 L280 540 L280 600 L230 590Z"
+    fill="#3a3a3a"
+  />
+
+  <!-- Anvil: heel (right extension) -->
+  <path
+    d="M744 540 L800 548 L790 592 L744 600Z"
+    fill="#3a3a3a"
+  />
+
+  <!-- Anvil: waist (narrower middle section) -->
+  <path
+    d="M380 600 L644 600 L664 640 L360 640Z"
+    fill="#333333"
+  />
+
+  <!-- Anvil: base (wide) -->
+  <path
+    d="M320 640 L704 640 L724 700 C724 715 714 725 700 725 L324 725 C310 725 300 715 300 700Z"
+    fill="#2a2a2a"
+  />
+
+  <!-- Anvil: base foot -->
+  <rect x="300" y="725" width="424" height="35" rx="8" fill="#222222"/>
+
+  <!-- Subtle anvil top highlight -->
+  <path
+    d="M300 540 L724 540 L724 550 L300 550Z"
+    fill="#5a5a5a"
+    opacity="0.5"
+  />
+</svg>

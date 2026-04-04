@@ -31,9 +31,9 @@ export function ToastNotifications() {
       position="bottom-right"
       toastOptions={{
         style: {
-          background: '#1a1a2e',
-          border: '1px solid #2a2a3e',
-          color: '#e0e0e0',
+          background: 'var(--card-bg)',
+          border: '1px solid var(--card-border)',
+          color: 'var(--fg)',
         },
       }}
     />

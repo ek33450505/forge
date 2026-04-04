@@ -2,7 +2,7 @@ import { useCastStore } from '../store/cast';
 import { AgentRunDetail } from './AgentRunDetail';
 
 const STATUS_DOT: Record<string, string> = {
-  done: '#70a840', running: '#e8a838', failed: '#c05020', blocked: '#d04020',
+  done: 'var(--success)', running: 'var(--warning)', failed: 'var(--error)', blocked: 'var(--error)',
 };
 
 export function AgentFeed() {
@@ -41,7 +41,7 @@ export function AgentFeed() {
                 background: expandedRunId === run.id ? 'rgba(232,168,56,0.06)' : 'transparent',
               }}
             >
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: STATUS_DOT[run.status] ?? '#b89878', flexShrink: 0 }} />
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: STATUS_DOT[run.status] ?? 'var(--text-muted)', flexShrink: 0 }} />
               <span style={{ fontSize: '11px', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{run.agent}</span>
               {run.started_at && (
                 <span style={{ fontSize: '10px', color: 'var(--status-bar-text)', flexShrink: 0 }}>

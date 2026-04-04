@@ -5,6 +5,10 @@ import type { ForgeTheme } from './types';
 const REQUIRED_KEYS: (keyof ForgeTheme)[] = [
   'name', 'displayName', 'background', 'foreground', 'accent',
   'sidebar', 'titleBar', 'statusBar', 'border', 'terminal',
+  'claudeAccent', 'claudeAccentBg', 'separatorColor', 'separatorHover',
+  'tabBar', 'tabActive', 'tabInactive', 'tabBorder', 'tabCloseHover',
+  'success', 'warning', 'error', 'textMuted', 'textSubtle',
+  'panelBackground', 'cardBackground', 'cardBorder',
 ];
 
 const REQUIRED_TERMINAL_KEYS = [

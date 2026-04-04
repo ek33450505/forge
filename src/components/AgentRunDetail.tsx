@@ -1,16 +1,16 @@
 import type { AgentRun } from '../types/cast';
 
 const STATUS_COLOR: Record<string, string> = {
-  done: '#70a840',
-  running: '#e8a838',
-  failed: '#c05020',
-  blocked: '#d04020',
+  done: 'var(--success)',
+  running: 'var(--warning)',
+  failed: 'var(--error)',
+  blocked: 'var(--error)',
 };
 
 interface Props { run: AgentRun; onClose: () => void; }
 
 export function AgentRunDetail({ run, onClose }: Props) {
-  const color = STATUS_COLOR[run.status] ?? '#b89878';
+  const color = STATUS_COLOR[run.status] ?? 'var(--text-muted)';
   const duration = run.started_at && run.ended_at
     ? Math.round((new Date(run.ended_at).getTime() - new Date(run.started_at).getTime()) / 1000)
     : null;

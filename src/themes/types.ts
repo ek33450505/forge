@@ -32,6 +32,24 @@ export interface ForgeTheme {
     thumb: string;
     track: string;
   };
+  // Phase 8 tokens
+  claudeAccent: string;
+  claudeAccentBg: string;
+  separatorColor: string;
+  separatorHover: string;
+  tabBar: string;
+  tabActive: string;
+  tabInactive: string;
+  tabBorder: string;
+  tabCloseHover: string;
+  success: string;
+  warning: string;
+  error: string;
+  textMuted: string;
+  textSubtle: string;
+  panelBackground: string;
+  cardBackground: string;
+  cardBorder: string;
   terminal: {
     background: string;
     foreground: string;

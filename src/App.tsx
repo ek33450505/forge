@@ -21,6 +21,10 @@ import { useCastFeed } from './hooks/useCastFeed';
 import { useCastData } from './hooks/useCastData';
 import { useCastStore } from './store/cast';
 import { AgentFeed } from './components/AgentFeed';
+import { TabBar } from './components/TabBar';
+import { AgentOutputPanel } from './components/AgentOutputPanel';
+import { useAgentOutput } from './hooks/useAgentOutput';
+import { useAgentOutputStore } from './store/agentOutput';
 import { useTheme } from './hooks/useTheme';
 import { loadForgeConfig } from './hooks/useForgeConfig';
 import { useThemeStore } from './store/theme';
@@ -164,6 +168,13 @@ function App() {
       handler: () => { void handleSplit('horizontal'); },
     });
     overwriteCommand({
+      id: 'new-tab',
+      label: 'New Tab',
+      group: 'Layout',
+      keybind: '⌘T',
+      handler: () => { void handleSplit('horizontal'); },
+    });
+    overwriteCommand({
       id: 'split-horizontal',
       label: 'Split Horizontal',
       group: 'Layout',
@@ -217,6 +228,13 @@ function App() {
       handler: () => { setSettingsPanelOpen(true); },
     });
     overwriteCommand({
+      id: 'toggle-agent-output',
+      label: 'Toggle Agent Output Panel',
+      group: 'Layout',
+      keybind: '⌘⇧O',
+      handler: () => { useAgentOutputStore.getState().togglePanel(); },
+    });
+    overwriteCommand({
       id: 'cast.toggle-feed',
       label: 'Toggle CAST Agent Feed',
       group: 'CAST',
@@ -260,6 +278,7 @@ function App() {
   useClaudeDetection();
   useCastFeed();
   useCastData();
+  useAgentOutput();
 
   return (
     <div
@@ -294,6 +313,12 @@ function App() {
         <span>Forge</span>
       </div>
 
+      {/* Tab bar */}
+      <TabBar
+        onNewSession={() => { void handleSplit('horizontal'); }}
+        onCloseSession={(paneId) => { useLayoutStore.getState().closePane(paneId); }}
+      />
+
       {/* Main content: sidebar + panes + info panel */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         <SessionSidebar
@@ -304,6 +329,7 @@ function App() {
           {ready && <PaneLayout />}
         </div>
         {feedOpen && <AgentFeed />}
+        <AgentOutputPanel />
         <InfoPanel open={infoPanelOpen} onClose={handleToggleInfoPanel} />
       </div>
 

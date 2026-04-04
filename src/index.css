@@ -34,6 +34,44 @@ body { font-family: 'Menlo', monospace; background: var(--bg, #1c1210); color: v
   animation: flame-dim 3s ease-in-out infinite;
 }
 
+/* ── Tab bar ── */
+.tab-close-btn:hover {
+  background: var(--tab-close-hover) !important;
+  opacity: 1 !important;
+}
+div:hover > .tab-close-btn {
+  opacity: 0.6 !important;
+}
+
+/* ── Ember mascot animations ── */
+@keyframes ember-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes ember-float-fast {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes ember-sway {
+  0%, 100% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+}
+@keyframes ember-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+@keyframes ember-droop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+
+.ember { transition: filter 300ms ease; }
+.ember--idle { animation: ember-float 3s ease-in-out infinite; }
+.ember--active { animation: ember-float-fast 1.5s ease-in-out infinite; filter: brightness(1.15); }
+.ember--thinking { animation: ember-sway 2s ease-in-out infinite; }
+.ember--done { animation: ember-bounce 0.5s ease-out; }
+.ember--error { animation: ember-droop 2s ease-in-out infinite; filter: brightness(0.7); }
+
 /* ── Warm scrollbar ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--scrollbar-track, #1a1008); }

@@ -27,9 +27,9 @@ export function TerminalPane({ sessionId, isActive, onFocus }: TerminalPaneProps
         display: 'flex',
         flexDirection: 'column',
         borderLeft: isClaude
-          ? '2px solid #c084fc'
+          ? '2px solid var(--claude-accent)'
           : isActive
-          ? '2px solid #e0e0e0'
+          ? '2px solid var(--accent)'
           : '2px solid transparent',
       }}
     >

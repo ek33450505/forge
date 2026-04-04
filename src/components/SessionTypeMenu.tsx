@@ -69,8 +69,8 @@ export function SessionTypeMenu({
           top: y,
           left: x,
           zIndex: 1000,
-          backgroundColor: '#1a2040',
-          border: '1px solid #2a3060',
+          backgroundColor: 'var(--modal-bg)',
+          border: '1px solid var(--card-border)',
           borderRadius: '4px',
           minWidth: '150px',
           boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
@@ -82,10 +82,10 @@ export function SessionTypeMenu({
             padding: '4px 10px',
             fontSize: '10px',
             fontWeight: 600,
-            color: '#6070a0',
+            color: 'var(--text-muted)',
             textTransform: 'uppercase',
             letterSpacing: '0.06em',
-            borderBottom: '1px solid #2a3060',
+            borderBottom: '1px solid var(--card-border)',
           }}
         >
           Session type
@@ -106,18 +106,18 @@ export function SessionTypeMenu({
                 gap: '6px',
                 padding: '6px 10px',
                 fontSize: '12px',
-                color: isChecked ? '#e0e0e0' : '#a0a8c0',
+                color: isChecked ? 'var(--fg)' : 'var(--text-muted)',
                 cursor: 'pointer',
                 backgroundColor: 'transparent',
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.backgroundColor = '#253060';
+                (e.currentTarget as HTMLDivElement).style.backgroundColor = 'var(--card-bg)';
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLDivElement).style.backgroundColor = 'transparent';
               }}
             >
-              <span style={{ width: '12px', flexShrink: 0, color: '#c084fc' }}>
+              <span style={{ width: '12px', flexShrink: 0, color: 'var(--claude-accent)' }}>
                 {isChecked ? '✓' : ''}
               </span>
               {label}

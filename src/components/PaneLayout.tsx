@@ -36,7 +36,7 @@ function PaneBranch({ node }: PaneBranchProps) {
         style={{
           width: orientation === 'horizontal' ? '4px' : undefined,
           height: orientation === 'vertical' ? '4px' : undefined,
-          backgroundColor: '#2a2a3e',
+          backgroundColor: 'var(--separator)',
           cursor: orientation === 'horizontal' ? 'col-resize' : 'row-resize',
           flexShrink: 0,
         }}

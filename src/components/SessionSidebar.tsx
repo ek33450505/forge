@@ -4,6 +4,7 @@ import { useSessionStore } from '../store/sessions';
 import type { LeafNode } from '../store/layout';
 import { SessionBadge } from './SessionBadge';
 import { SessionTypeMenu } from './SessionTypeMenu';
+import { Ember } from './Ember';
 import type { SessionType } from '../types/sessions';
 
 function collectLeavesFromRoot(node: import('../store/layout').PaneNode): LeafNode[] {
@@ -53,12 +54,12 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, sessionType, onSelect
         padding: '6px 10px',
         cursor: 'pointer',
         borderLeft: isClaude
-          ? '2px solid #d070f0'
+          ? '2px solid var(--claude-accent)'
           : isActive
           ? '2px solid var(--accent)'
           : '2px solid transparent',
         backgroundColor: isClaude
-          ? 'rgba(180, 60, 220, 0.10)'
+          ? 'var(--claude-accent-bg)'
           : isActive
           ? 'color-mix(in srgb, var(--accent) 10%, transparent)'
           : 'transparent',
@@ -237,6 +238,19 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
                 />
               );
             })}
+          </div>
+          {/* Ember mascot */}
+          <div
+            style={{
+              height: '64px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderTop: '1px solid var(--sidebar-border)',
+              flexShrink: 0,
+            }}
+          >
+            <Ember />
           </div>
         </>
       )}

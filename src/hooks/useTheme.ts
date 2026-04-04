@@ -29,6 +29,25 @@ export function useTheme(): ForgeTheme {
     root.style.setProperty('--modal-bg', theme.modalBackground);
     root.style.setProperty('--modal-overlay', theme.modalOverlay);
 
+    // Phase 8 tokens
+    root.style.setProperty('--claude-accent', theme.claudeAccent);
+    root.style.setProperty('--claude-accent-bg', theme.claudeAccentBg);
+    root.style.setProperty('--separator', theme.separatorColor);
+    root.style.setProperty('--separator-hover', theme.separatorHover);
+    root.style.setProperty('--tab-bar', theme.tabBar);
+    root.style.setProperty('--tab-active', theme.tabActive);
+    root.style.setProperty('--tab-inactive', theme.tabInactive);
+    root.style.setProperty('--tab-border', theme.tabBorder);
+    root.style.setProperty('--tab-close-hover', theme.tabCloseHover);
+    root.style.setProperty('--success', theme.success);
+    root.style.setProperty('--warning', theme.warning);
+    root.style.setProperty('--error', theme.error);
+    root.style.setProperty('--text-muted', theme.textMuted);
+    root.style.setProperty('--text-subtle', theme.textSubtle);
+    root.style.setProperty('--panel-bg', theme.panelBackground);
+    root.style.setProperty('--card-bg', theme.cardBackground);
+    root.style.setProperty('--card-border', theme.cardBorder);
+
     // Glow properties
     if (theme.glows) {
       root.style.setProperty('--glow-pane-active', theme.glows.activePaneHeader);

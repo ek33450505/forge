@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLayoutStore } from '../store/layout';
 import { useCastStore } from '../store/cast';
+import { useAgentOutputStore } from '../store/agentOutput';
 
 export function useKeyboardShortcuts(
   onSplit?: (direction: 'horizontal' | 'vertical') => void,
@@ -19,6 +20,12 @@ export function useKeyboardShortcuts(
       if (e.metaKey && !e.shiftKey && e.key === 'k') {
         e.preventDefault();
         onToggleCommandPalette?.();
+      }
+
+      // Cmd+T — new tab (same as new session)
+      if (e.metaKey && !e.shiftKey && e.key === 't') {
+        e.preventDefault();
+        onSplit?.('horizontal');
       }
 
       // Cmd+D — split horizontal
@@ -63,6 +70,12 @@ export function useKeyboardShortcuts(
       if (e.metaKey && !e.shiftKey && e.key === ',') {
         e.preventDefault();
         onToggleSettings?.();
+      }
+
+      // Cmd+Shift+O — toggle Agent Output panel
+      if (e.metaKey && e.shiftKey && (e.key === 'o' || e.key === 'O')) {
+        e.preventDefault();
+        useAgentOutputStore.getState().togglePanel();
       }
 
       // Cmd+Shift+A — toggle CAST agent feed

@@ -26,7 +26,7 @@ export function PaneHeader({ sessionId, isActive }: PaneHeaderProps) {
         backgroundColor: isActive ? 'var(--pane-header-active-bg)' : 'var(--pane-header-bg)',
         borderBottom: '1px solid var(--border)',
         borderLeft: isClaude
-          ? '2px solid #d070f0'
+          ? '2px solid var(--claude-accent)'
           : isActive
           ? '2px solid var(--accent)'
           : '2px solid transparent',

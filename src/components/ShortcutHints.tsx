@@ -21,22 +21,22 @@ export function ShortcutHints({ visible }: ShortcutHintsProps) {
       style={{
         height: '20px',
         flexShrink: 0,
-        backgroundColor: '#0a1020',
-        borderTop: '1px solid #1e1e2e',
+        backgroundColor: 'var(--tab-bar)',
+        borderTop: '1px solid var(--card-border)',
         display: 'flex',
         alignItems: 'center',
         paddingLeft: '8px',
         paddingRight: '8px',
         gap: '12px',
         fontSize: '10px',
-        color: '#666688',
+        color: 'var(--text-subtle)',
         userSelect: 'none',
         overflowX: 'auto',
       }}
     >
       {HINTS.map(({ key, label }) => (
         <span key={key}>
-          <kbd style={{ color: '#aaaacc', fontFamily: 'monospace' }}>{key}</kbd>
+          <kbd style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>{key}</kbd>
           {' '}{label}
         </span>
       ))}

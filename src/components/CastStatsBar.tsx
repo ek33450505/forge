@@ -15,7 +15,7 @@ export function CastStatsBar() {
   return (
     <>
       {stats.active_agents > 0 && (
-        <span style={{ color: '#e8a838' }}>
+        <span style={{ color: 'var(--warning)' }}>
           {stats.active_agents} agent{stats.active_agents !== 1 ? 's' : ''} running
         </span>
       )}
