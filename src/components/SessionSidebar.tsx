@@ -115,18 +115,35 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
   return (
     <div
       style={{
-        width: collapsed ? '0' : '180px',
-        minWidth: collapsed ? '0' : '180px',
+        width: collapsed ? '20px' : '180px',
+        minWidth: collapsed ? '20px' : '180px',
         backgroundColor: '#16213e',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        borderRight: collapsed ? 'none' : '1px solid #2a2a3e',
+        borderRight: '1px solid #2a2a3e',
         transition: 'width 150ms ease, min-width 150ms ease',
         flexShrink: 0,
       }}
     >
-      {!collapsed && (
+      {collapsed ? (
+        <button
+          onClick={onToggle}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#6070a0',
+            cursor: 'pointer',
+            fontSize: '14px',
+            padding: '6px 0',
+            width: '100%',
+            textAlign: 'center',
+          }}
+          title="Expand sidebar (Cmd+B)"
+        >
+          ›
+        </button>
+      ) : (
         <>
           <div
             style={{
