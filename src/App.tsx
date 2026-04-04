@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { PaneLayout } from './components/PaneLayout';
 import { SessionSidebar } from './components/SessionSidebar';
@@ -6,9 +6,16 @@ import { useLayoutStore } from './store/layout';
 import { useSessionStore } from './store/sessions';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
+let shellCounter = 0;
+function nextShellName() {
+  shellCounter += 1;
+  return `Shell ${shellCounter}`;
+}
+
 function App() {
   const [ready, setReady] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const initialized = useRef(false);
 
   const initialize = useLayoutStore((s) => s.initialize);
   const splitPane = useLayoutStore((s) => s.splitPane);
@@ -16,8 +23,11 @@ function App() {
   const activePaneId = useLayoutStore((s) => s.activePaneId);
   const addSession = useSessionStore((s) => s.addSession);
 
-  // Create first PTY session on mount
+  // Create first PTY session on mount (guarded against StrictMode double-mount)
   useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
     void (async () => {
       try {
         const sessionId = await invoke<string>('pty_create', {
@@ -27,7 +37,7 @@ function App() {
         });
         addSession({
           id: sessionId,
-          name: 'Shell 1',
+          name: nextShellName(),
           shell: '/bin/zsh',
           created_at: Date.now() / 1000,
         });
@@ -36,7 +46,7 @@ function App() {
         setReady(true);
       } catch (err) {
         console.error('Failed to create initial PTY session:', err);
-        setReady(true); // Render UI anyway so user sees something
+        setReady(true);
       }
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -52,10 +62,9 @@ function App() {
         cols: 80,
         rows: 24,
       });
-      const count = Object.keys(useSessionStore.getState().sessions).length;
       addSession({
         id: sessionId,
-        name: `Shell ${count + 1}`,
+        name: nextShellName(),
         shell: '/bin/zsh',
         created_at: Date.now() / 1000,
       });
@@ -73,10 +82,9 @@ function App() {
         cols: 80,
         rows: 24,
       });
-      const count = Object.keys(useSessionStore.getState().sessions).length;
       addSession({
         id: sessionId,
-        name: `Shell ${count + 1}`,
+        name: nextShellName(),
         shell: '/bin/zsh',
         created_at: Date.now() / 1000,
       });

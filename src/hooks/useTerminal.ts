@@ -43,15 +43,14 @@ export function useTerminal(
 
       (async () => {
         try {
-          // PTY already created by caller — just resize to current dimensions
-          void invoke('pty_resize', { sessionId, cols, rows });
-
+          // 1. Wire up input first
           terminal.onData((data) => {
             if (isMounted) {
               void invoke('pty_write', { sessionId, data });
             }
           });
 
+          // 2. Start listening for output BEFORE resize
           const unlisten = await listen<PtyOutputPayload>(`pty-output-${sessionId}`, (event) => {
             terminal.write(event.payload.data);
           });
@@ -61,6 +60,9 @@ export function useTerminal(
             return;
           }
           unlistenFn = unlisten;
+
+          // 3. NOW resize — the shell redraws the prompt and we catch it
+          await invoke('pty_resize', { sessionId, cols, rows });
         } catch (err: unknown) {
           console.error('useTerminal: initialization failed', err);
         }
