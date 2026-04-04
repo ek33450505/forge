@@ -28,6 +28,30 @@ export function useTheme(): ForgeTheme {
     root.style.setProperty('--input-text', theme.inputText);
     root.style.setProperty('--modal-bg', theme.modalBackground);
     root.style.setProperty('--modal-overlay', theme.modalOverlay);
+
+    // Glow properties
+    if (theme.glows) {
+      root.style.setProperty('--glow-pane-active', theme.glows.activePaneHeader);
+      root.style.setProperty('--glow-sidebar-item', theme.glows.sidebarItem);
+      root.style.setProperty('--glow-title-radial', theme.glows.titleBarRadial);
+    } else {
+      root.style.setProperty('--glow-pane-active', 'none');
+      root.style.setProperty('--glow-sidebar-item', 'none');
+      root.style.setProperty('--glow-title-radial', 'none');
+    }
+    // Gradient properties
+    if (theme.gradients) {
+      root.style.setProperty('--sidebar-gradient', theme.gradients.sidebar);
+      root.style.setProperty('--status-bar-gradient', theme.gradients.statusBar);
+    } else {
+      root.style.setProperty('--sidebar-gradient', theme.sidebar);
+      root.style.setProperty('--status-bar-gradient', theme.statusBar);
+    }
+    // Scrollbar properties
+    if (theme.scrollbar) {
+      root.style.setProperty('--scrollbar-thumb', theme.scrollbar.thumb);
+      root.style.setProperty('--scrollbar-track', theme.scrollbar.track);
+    }
   }, [theme]);
 
   return theme;

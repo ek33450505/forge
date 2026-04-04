@@ -1,7 +1,7 @@
 export interface Command {
   id: string;
   label: string;
-  group: 'Layout' | 'Session' | 'Settings';
+  group: 'Layout' | 'Session' | 'Settings' | 'CAST';
   keywords?: string[];
   keybind?: string; // display string e.g. "⌘D"
   handler: () => void;

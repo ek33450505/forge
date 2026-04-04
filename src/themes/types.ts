@@ -19,6 +19,19 @@ export interface ForgeTheme {
   inputText: string;
   modalBackground: string;
   modalOverlay: string;
+  glows?: {
+    activePaneHeader: string;   // box-shadow value
+    sidebarItem: string;        // box-shadow value for active sidebar items
+    titleBarRadial: string;     // radial-gradient CSS string for title bar overlay
+  };
+  gradients?: {
+    sidebar: string;            // background linear-gradient for sidebar
+    statusBar: string;          // background linear-gradient for status bar
+  };
+  scrollbar?: {
+    thumb: string;
+    track: string;
+  };
   terminal: {
     background: string;
     foreground: string;

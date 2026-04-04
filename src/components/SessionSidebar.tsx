@@ -45,6 +45,7 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, sessionType, onSelect
         setEditing(true);
       }}
       onContextMenu={onContextMenu}
+      className={isActive ? 'sidebar-item--active' : undefined}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -65,6 +66,7 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, sessionType, onSelect
       }}
     >
       <span
+        className="sidebar-session-number"
         style={{
           fontSize: '11px',
           color: 'var(--status-bar-text)',
@@ -73,7 +75,7 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, sessionType, onSelect
           flexShrink: 0,
         }}
       >
-        {index + 1}
+        {String(index + 1).padStart(2, '0')}
       </span>
       {editing ? (
         <input
@@ -147,7 +149,7 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
       style={{
         width: collapsed ? '20px' : '180px',
         minWidth: collapsed ? '20px' : '180px',
-        backgroundColor: 'var(--sidebar-bg)',
+        background: 'var(--sidebar-gradient, var(--sidebar-bg))',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -186,6 +188,7 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
             }}
           >
             <span
+              className="sidebar-section-label"
               style={{
                 fontSize: '11px',
                 fontWeight: 600,

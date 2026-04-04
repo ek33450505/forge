@@ -1,6 +1,7 @@
 import { useCwdWatch } from '../hooks/useCwdWatch';
 import { useGitStatus } from '../hooks/useGitStatus';
 import { useSessionStore } from '../store/sessions';
+import { CastStatsBar } from './CastStatsBar';
 
 interface StatusBarProps {
   onToggleInfoPanel: () => void;
@@ -43,6 +44,9 @@ export function StatusBar({ onToggleInfoPanel }: StatusBarProps) {
           {gitStatus.dirty ? '● ' : ''}{gitStatus.branch}
         </span>
       )}
+
+      {/* CAST stats */}
+      <CastStatsBar />
 
       <span style={{ flex: 1 }} />
 

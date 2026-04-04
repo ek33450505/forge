@@ -21,6 +21,19 @@ export const forgeDark: ForgeTheme = {
   inputText: '#e8dcc8',
   modalBackground: '#261410',
   modalOverlay: 'rgba(0, 0, 0, 0.7)',
+  glows: {
+    activePaneHeader: '0 0 8px 1px rgba(232, 168, 56, 0.18), inset 0 -1px 0 rgba(232, 168, 56, 0.12)',
+    sidebarItem: 'inset 2px 0 0 #e8a838, inset 0 0 8px rgba(232, 168, 56, 0.08)',
+    titleBarRadial: 'radial-gradient(ellipse 60px 30px at 20px 50%, rgba(232,168,56,0.08) 0%, transparent 100%)',
+  },
+  gradients: {
+    sidebar: 'linear-gradient(180deg, #1e1008 0%, #261410 60%, #2e160a 100%)',
+    statusBar: 'linear-gradient(90deg, #0e0906 0%, #130b04 50%, #0e0906 100%)',
+  },
+  scrollbar: {
+    thumb: '#5a3020',
+    track: '#1a1008',
+  },
   terminal: {
     background: '#1a1008',
     foreground: '#e8dcc8',

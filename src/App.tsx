@@ -18,6 +18,9 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useProcessInspection } from './hooks/useProcessInspection';
 import { useClaudeDetection } from './hooks/useClaudeDetection';
 import { useCastFeed } from './hooks/useCastFeed';
+import { useCastData } from './hooks/useCastData';
+import { useCastStore } from './store/cast';
+import { AgentFeed } from './components/AgentFeed';
 import { useTheme } from './hooks/useTheme';
 import { loadForgeConfig } from './hooks/useForgeConfig';
 import { useThemeStore } from './store/theme';
@@ -58,6 +61,9 @@ function App() {
         if (cfg.theme) useThemeStore.getState().setTheme(cfg.theme);
         if (cfg.fontFamily) useThemeStore.getState().setFontFamily(cfg.fontFamily);
         if (cfg.fontSize) useThemeStore.getState().setFontSize(cfg.fontSize);
+
+        // Initialize CAST detection and data
+        void useCastStore.getState().initialize();
 
         const sessionId = await invoke<string>('pty_create', {
           shell: '/bin/zsh',
@@ -210,6 +216,30 @@ function App() {
       keybind: '⌘,',
       handler: () => { setSettingsPanelOpen(true); },
     });
+    overwriteCommand({
+      id: 'cast.toggle-feed',
+      label: 'Toggle CAST Agent Feed',
+      group: 'CAST',
+      keywords: ['cast', 'agents', 'feed', 'activity'],
+      keybind: '⌘⇧A',
+      handler: () => {
+        const store = useCastStore.getState();
+        if (store.available) store.setFeedOpen(!store.feedOpen);
+      },
+    });
+    overwriteCommand({
+      id: 'cast.refresh',
+      label: 'Refresh CAST Data',
+      group: 'CAST',
+      keywords: ['cast', 'refresh', 'reload'],
+      handler: () => {
+        const store = useCastStore.getState();
+        if (store.available) {
+          void store.refreshRuns();
+          void store.refreshStats();
+        }
+      },
+    });
   }, [handleSplit]);
 
   const handleExecuteCommand = useCallback(
@@ -223,10 +253,13 @@ function App() {
     [],
   );
 
+  const feedOpen = useCastStore((s) => s.feedOpen);
+
   useKeyboardShortcuts(handleSplit, handleToggleSidebar, handleToggleInfoPanel, handleToggleShortcutHints, handleToggleCommandPalette, handleToggleSettings);
   useProcessInspection();
   useClaudeDetection();
   useCastFeed();
+  useCastData();
 
   return (
     <div
@@ -242,6 +275,7 @@ function App() {
     >
       {/* Title bar */}
       <div
+        className="title-bar"
         style={{
           height: '28px',
           flexShrink: 0,
@@ -253,6 +287,7 @@ function App() {
           fontWeight: 600,
           color: 'var(--title-bar-text)',
           userSelect: 'none',
+          position: 'relative',
         }}
       >
         <Flame />
@@ -268,6 +303,7 @@ function App() {
         <div style={{ flex: 1, overflow: 'hidden' }}>
           {ready && <PaneLayout />}
         </div>
+        {feedOpen && <AgentFeed />}
         <InfoPanel open={infoPanelOpen} onClose={handleToggleInfoPanel} />
       </div>
 

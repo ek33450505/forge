@@ -33,3 +33,48 @@ body { font-family: 'Menlo', monospace; background: var(--bg, #1c1210); color: v
 .forge-flame--error {
   animation: flame-dim 3s ease-in-out infinite;
 }
+
+/* ── Warm scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track, #1a1008); }
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, #5a3020);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--accent-soft, #b05828); }
+
+/* ── Active pane header glow ── */
+.pane-header--active {
+  box-shadow: var(--glow-pane-active, none);
+}
+
+/* ── Warm pane border pulse animation ── */
+@keyframes border-ember {
+  0%, 100% { border-color: var(--border); }
+  50% { border-color: var(--accent-soft); }
+}
+.pane--active {
+  animation: border-ember 4s ease-in-out infinite;
+}
+
+/* ── Sidebar active item glow ── */
+.sidebar-item--active {
+  box-shadow: var(--glow-sidebar-item, none);
+}
+
+/* ── Session header typography ── */
+.sidebar-section-label {
+  letter-spacing: 0.12em;
+}
+.sidebar-session-number {
+  color: var(--accent-soft);
+}
+
+/* ── Title bar radial glow ── */
+.title-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--glow-title-radial, none);
+  pointer-events: none;
+}

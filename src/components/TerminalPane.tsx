@@ -20,6 +20,7 @@ export function TerminalPane({ sessionId, isActive, onFocus }: TerminalPaneProps
   return (
     <div
       onMouseDown={onFocus}
+      className={isActive ? 'pane--active' : undefined}
       style={{
         width: '100%',
         height: '100%',

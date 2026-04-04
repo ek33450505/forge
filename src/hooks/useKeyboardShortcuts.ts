@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLayoutStore } from '../store/layout';
+import { useCastStore } from '../store/cast';
 
 export function useKeyboardShortcuts(
   onSplit?: (direction: 'horizontal' | 'vertical') => void,
@@ -62,6 +63,15 @@ export function useKeyboardShortcuts(
       if (e.metaKey && !e.shiftKey && e.key === ',') {
         e.preventDefault();
         onToggleSettings?.();
+      }
+
+      // Cmd+Shift+A — toggle CAST agent feed
+      if (e.metaKey && e.shiftKey && (e.key === 'a' || e.key === 'A')) {
+        e.preventDefault();
+        const castState = useCastStore.getState();
+        if (castState.available) {
+          castState.setFeedOpen(!castState.feedOpen);
+        }
       }
 
       // Cmd+1 through Cmd+9 — switch to pane by index

@@ -15,6 +15,7 @@ export function PaneHeader({ sessionId, isActive }: PaneHeaderProps) {
 
   return (
     <div
+      className={isActive ? 'pane-header--active' : undefined}
       style={{
         height: '24px',
         display: 'flex',
@@ -29,7 +30,6 @@ export function PaneHeader({ sessionId, isActive }: PaneHeaderProps) {
           : isActive
           ? '2px solid var(--accent)'
           : '2px solid transparent',
-        boxShadow: isActive ? 'inset 0 -1px 0 var(--accent)' : 'none',
         flexShrink: 0,
         userSelect: 'none',
         fontSize: '12px',
