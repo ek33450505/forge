@@ -52,14 +52,14 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, sessionType, onSelect
         padding: '6px 10px',
         cursor: 'pointer',
         borderLeft: isClaude
-          ? '2px solid #c084fc'
+          ? '2px solid #d070f0'
           : isActive
-          ? '2px solid #e0e0e0'
+          ? '2px solid var(--accent)'
           : '2px solid transparent',
         backgroundColor: isClaude
-          ? '#1a0f2e'
+          ? 'rgba(180, 60, 220, 0.10)'
           : isActive
-          ? '#1e2a4a'
+          ? 'color-mix(in srgb, var(--accent) 10%, transparent)'
           : 'transparent',
         userSelect: 'none',
       }}
@@ -67,7 +67,7 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, sessionType, onSelect
       <span
         style={{
           fontSize: '11px',
-          color: '#6070a0',
+          color: 'var(--status-bar-text)',
           minWidth: '14px',
           textAlign: 'right',
           flexShrink: 0,
@@ -87,10 +87,10 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, sessionType, onSelect
           }}
           style={{
             flex: 1,
-            background: '#0d1526',
-            border: '1px solid #4060a0',
+            background: 'var(--input-bg)',
+            border: '1px solid var(--accent)',
             borderRadius: '2px',
-            color: '#e0e0e0',
+            color: 'var(--fg)',
             fontSize: '12px',
             padding: '1px 4px',
             outline: 'none',
@@ -102,7 +102,7 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, sessionType, onSelect
             style={{
               flex: 1,
               fontSize: '12px',
-              color: isActive ? '#e0e0e0' : '#a0a8c0',
+              color: isActive ? 'var(--fg)' : 'var(--status-bar-text)',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -162,7 +162,7 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
           style={{
             background: 'none',
             border: 'none',
-            color: '#6070a0',
+            color: 'var(--status-bar-text)',
             cursor: 'pointer',
             fontSize: '14px',
             padding: '6px 0',
@@ -189,7 +189,7 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
               style={{
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#6070a0',
+                color: 'var(--status-bar-text)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
               }}
@@ -201,7 +201,7 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#6070a0',
+                color: 'var(--status-bar-text)',
                 cursor: 'pointer',
                 fontSize: '14px',
                 lineHeight: 1,

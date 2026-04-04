@@ -25,10 +25,11 @@ export function PaneHeader({ sessionId, isActive }: PaneHeaderProps) {
         backgroundColor: isActive ? 'var(--pane-header-active-bg)' : 'var(--pane-header-bg)',
         borderBottom: '1px solid var(--border)',
         borderLeft: isClaude
-          ? '2px solid #c084fc'
+          ? '2px solid #d070f0'
           : isActive
           ? '2px solid var(--accent)'
           : '2px solid transparent',
+        boxShadow: isActive ? 'inset 0 -1px 0 var(--accent)' : 'none',
         flexShrink: 0,
         userSelect: 'none',
         fontSize: '12px',

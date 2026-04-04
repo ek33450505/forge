@@ -3,31 +3,31 @@ import type { ForgeTheme } from './types';
 export const forgeDark: ForgeTheme = {
   name: 'forge-dark',
   displayName: 'Forge Dark',
-  background: '#1c1210',
+  background: '#1a1008',        // terminal area — deep warm black
   foreground: '#e8dcc8',
-  accent: '#e8a838',
-  accentSoft: '#8b4010',
-  sidebar: '#211510',
-  sidebarBorder: '#3a2218',
-  titleBar: '#140e0c',
+  accent: '#e8a838',            // amber
+  accentSoft: '#b05828',        // visible ember (was too dark at #8b4010)
+  sidebar: '#261410',           // noticeably warmer/redder than terminal bg
+  sidebarBorder: '#5a3020',     // visible warm border (was invisible #3a2218)
+  titleBar: '#0e0906',
   titleBarText: '#e8dcc8',
-  paneHeader: '#1c1210',
-  paneHeaderActive: '#2a1a12',
+  paneHeader: '#1a1008',
+  paneHeaderActive: '#2e1a0a',  // visible active bg contrast
   paneHeaderText: '#e8dcc8',
-  statusBar: '#140e0c',
-  statusBarText: '#b89878',
-  border: '#3a2218',
-  inputBackground: '#211510',
+  statusBar: '#0e0906',
+  statusBarText: '#b89878',     // warm tan, not blue
+  border: '#5a3020',            // visible (was invisible #3a2218)
+  inputBackground: '#261410',
   inputText: '#e8dcc8',
-  modalBackground: '#211510',
-  modalOverlay: 'rgba(0, 0, 0, 0.6)',
+  modalBackground: '#261410',
+  modalOverlay: 'rgba(0, 0, 0, 0.7)',
   terminal: {
-    background: '#1c1210',
+    background: '#1a1008',
     foreground: '#e8dcc8',
     cursor: '#e8a838',
-    cursorAccent: '#1c1210',
+    cursorAccent: '#1a1008',
     selectionBackground: 'rgba(232, 168, 56, 0.25)',
-    black: '#1c1210',
+    black: '#1a1008',
     red: '#c05020',
     green: '#70a840',
     yellow: '#e8a838',

@@ -6,9 +6,9 @@ interface SessionBadgeProps {
 }
 
 const BADGE_CONFIG: Record<SessionType, { label: string; bg: string; color: string }> = {
-  claude: { label: 'Claude', bg: '#3d1f6e', color: '#c084fc' },
-  shell:  { label: 'Shell',  bg: '#1a2a1a', color: '#6070a0' },
-  unknown: { label: '',     bg: 'transparent', color: 'transparent' },
+  claude: { label: 'Claude', bg: '#2a1530',  color: '#d070f0' },
+  shell:  { label: 'Shell',  bg: '#2a1608',  color: '#c8903a' },
+  unknown: { label: '',      bg: 'transparent', color: 'transparent' },
 };
 
 export function SessionBadge({ type, size = 'sm' }: SessionBadgeProps) {
