@@ -16,6 +16,7 @@ export function TabBar({ onNewTab, onCloseTab }: TabBarProps) {
 
   return (
     <div
+      role="tablist"
       style={{
         height: '32px',
         flexShrink: 0,
@@ -48,6 +49,8 @@ export function TabBar({ onNewTab, onCloseTab }: TabBarProps) {
         return (
           <div
             key={tab.id}
+            role="tab"
+            aria-selected={isActive}
             onMouseDown={(e) => {
               // Middle-click to close
               if (e.button === 1) {
@@ -129,6 +132,7 @@ export function TabBar({ onNewTab, onCloseTab }: TabBarProps) {
           lineHeight: 1,
           flexShrink: 0,
         }}
+        aria-label="New tab"
         title="New tab (⌘T)"
       >
         +

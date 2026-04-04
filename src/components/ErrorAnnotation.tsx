@@ -32,6 +32,7 @@ export function ErrorAnnotation({ sessionId }: ErrorAnnotationProps) {
       {annotations.map((ann) => (
         <div
           key={ann.id}
+          role="alert"
           style={{
             display: 'flex',
             alignItems: 'flex-start',

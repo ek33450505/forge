@@ -97,6 +97,7 @@ export function TerminalSearch({ sessionId }: TerminalSearchProps) {
 
   return (
     <div
+      role="search"
       style={{
         position: 'absolute',
         top: '4px',
@@ -116,6 +117,7 @@ export function TerminalSearch({ sessionId }: TerminalSearchProps) {
       <input
         ref={inputRef}
         type="text"
+        aria-label="Search terminal output"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -135,7 +137,7 @@ export function TerminalSearch({ sessionId }: TerminalSearchProps) {
 
       {/* Match count */}
       {query && (
-        <span style={{ color: 'var(--fg-muted)', fontSize: '11px', minWidth: '40px', textAlign: 'center' }}>
+        <span aria-live="polite" style={{ color: 'var(--fg-muted)', fontSize: '11px', minWidth: '40px', textAlign: 'center' }}>
           {matchCount > 0 ? `${matchIndex} / ${matchCount}` : 'No results'}
         </span>
       )}

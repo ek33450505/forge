@@ -2,6 +2,7 @@ import { Group, Panel, Separator } from 'react-resizable-panels';
 import type { PaneNode, LeafNode, BranchNode } from '../store/layout';
 import { useLayoutStore } from '../store/layout';
 import { TerminalPane } from './TerminalPane';
+import { ErrorBoundary } from './ErrorBoundary';
 
 interface PaneLeafProps {
   node: LeafNode;
@@ -79,7 +80,9 @@ export function PaneLayout() {
             pointerEvents: tab.id === activeTabId ? 'auto' : 'none',
           }}
         >
-          <PaneTree node={tab.root} />
+          <ErrorBoundary>
+            <PaneTree node={tab.root} />
+          </ErrorBoundary>
         </div>
       ))}
     </div>

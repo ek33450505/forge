@@ -38,6 +38,8 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, sessionType, onSelect
 
   return (
     <div
+      role="option"
+      aria-selected={isActive}
       onMouseDown={onSelect}
       onDoubleClick={(e) => {
         e.stopPropagation();
@@ -79,6 +81,7 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, sessionType, onSelect
       </span>
       {editing ? (
         <input
+          aria-label="Rename session"
           autoFocus
           value={draft}
           onChange={(e) => { setDraft(e.target.value); }}
@@ -231,7 +234,7 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
               ‹
             </button>
           </div>
-          <div style={{ flex: 1, overflowY: 'auto' }}>
+          <div role="listbox" style={{ flex: 1, overflowY: 'auto' }}>
             {leaves.map((leaf, index) => {
               const session = sessions[leaf.sessionId];
               const name = session?.name ?? `Shell ${index + 1}`;

@@ -27,6 +27,7 @@ export function StatusBar({ onToggleInfoPanel, shortcutRefOpen, onToggleShortcut
   return (
     <>
       <div
+        role="status"
         style={{
           height: '24px',
           flexShrink: 0,

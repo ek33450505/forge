@@ -43,6 +43,7 @@ export function SettingsPanel({ open, onClose, initialTab = 'appearance' }: Sett
           }}
         />
         <Dialog.Content
+          aria-label="Settings"
           style={{
             position: 'fixed',
             top: '50%',

@@ -6,6 +6,7 @@ import { TerminalSearch } from './TerminalSearch';
 import { GhostTextOverlay } from './GhostTextOverlay';
 import { ErrorAnnotation } from './ErrorAnnotation';
 import { PaneHeader } from './PaneHeader';
+import { ErrorBoundary } from './ErrorBoundary';
 import { useErrorDetection } from '../hooks/useErrorDetection';
 import { useCompletionNotifier } from '../hooks/useCompletionNotifier';
 
@@ -41,16 +42,18 @@ export function TerminalPane({ paneId, sessionId, isActive, onFocus }: TerminalP
           : '2px solid transparent',
       }}
     >
-      <PaneHeader sessionId={sessionId} paneId={paneId} isActive={isActive} />
-      <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
-        <div
-          ref={containerRef}
-          style={{ width: '100%', height: '100%' }}
-        />
-        <TerminalSearch sessionId={sessionId} />
-        <GhostTextOverlay sessionId={sessionId} />
-        <ErrorAnnotation sessionId={sessionId} />
-      </div>
+      <ErrorBoundary paneId={paneId}>
+        <PaneHeader sessionId={sessionId} paneId={paneId} isActive={isActive} />
+        <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
+          <div
+            ref={containerRef}
+            style={{ width: '100%', height: '100%' }}
+          />
+          <TerminalSearch sessionId={sessionId} />
+          <GhostTextOverlay sessionId={sessionId} />
+          <ErrorAnnotation sessionId={sessionId} />
+        </div>
+      </ErrorBoundary>
     </div>
   );
 }

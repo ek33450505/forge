@@ -161,6 +161,8 @@ export function CommandPalette({ open, onClose, onExecute }: Props) {
     >
       {/* Dialog — stop propagation so clicks inside don't close */}
       <div
+        role="dialog"
+        aria-label="Command palette"
         onClick={(e) => e.stopPropagation()}
         style={{
           position: 'fixed',
