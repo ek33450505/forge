@@ -52,7 +52,7 @@ describe('theme registry', () => {
       if (name === 'forge-dark') {
         it('forge-dark uses fire colors (no old blue background)', () => {
           expect(theme.background).not.toMatch(/^#1a1a/i);
-          expect(theme.background).toBe('#1c1210');
+          expect(theme.background).toBe('#1a1008');
         });
 
         it('forge-dark accent is in amber/orange range', () => {
@@ -61,7 +61,7 @@ describe('theme registry', () => {
 
         it('forge-dark has correct fire palette values', () => {
           expect(theme.accent).toBe('#e8a838');
-          expect(theme.accentSoft).toBe('#8b4010');
+          expect(theme.accentSoft).toBe('#b05828');
           expect(theme.foreground).toBe('#e8dcc8');
         });
       }
