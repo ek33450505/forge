@@ -4,7 +4,8 @@ use std::io::Read;
 use tauri::{AppHandle, Emitter, State};
 use uuid::Uuid;
 
-use crate::session::{PtySession, SessionStore};
+use crate::session::{PtySession, SessionInfo, SessionStore};
+use std::time::SystemTime;
 
 #[derive(Clone, Serialize)]
 struct PtyOutputPayload {
@@ -50,6 +51,17 @@ pub fn pty_create(
     };
 
     state.sessions.lock().insert(session_id.clone(), session);
+
+    let info = SessionInfo {
+        id: session_id.clone(),
+        name: format!("Shell {}", state.metadata.lock().len() + 1),
+        shell: shell.clone(),
+        created_at: SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs(),
+    };
+    state.metadata.lock().insert(session_id.clone(), info);
 
     let sid = session_id.clone();
     std::thread::spawn(move || {
@@ -133,6 +145,7 @@ pub fn pty_kill(session_id: String, state: State<SessionStore>) -> Result<(), St
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
 
     drop(session);
+    state.metadata.lock().remove(&session_id);
 
     Ok(())
 }

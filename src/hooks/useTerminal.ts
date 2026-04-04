@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
@@ -6,16 +6,10 @@ import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import type { PtyOutputPayload } from '../types/ipc';
 
-interface UseTerminalResult {
-  sessionId: string | null;
-}
-
 export function useTerminal(
-  containerRef: React.RefObject<HTMLDivElement>
-): UseTerminalResult {
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const sessionIdRef = useRef<string | null>(null);
-
+  containerRef: React.RefObject<HTMLDivElement>,
+  sessionId: string,
+): void {
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -49,24 +43,16 @@ export function useTerminal(
 
       (async () => {
         try {
-          const id = await invoke<string>('pty_create', { shell: '/bin/zsh', cols, rows });
-
-          if (!isMounted) {
-            void invoke('pty_kill', { sessionId: id });
-            return;
-          }
-
-          sessionIdRef.current = id;
-          setSessionId(id);
+          // PTY already created by caller — just resize to current dimensions
+          void invoke('pty_resize', { sessionId, cols, rows });
 
           terminal.onData((data) => {
-            const currentId = sessionIdRef.current;
-            if (currentId) {
-              void invoke('pty_write', { sessionId: currentId, data });
+            if (isMounted) {
+              void invoke('pty_write', { sessionId, data });
             }
           });
 
-          const unlisten = await listen<PtyOutputPayload>(`pty-output-${id}`, (event) => {
+          const unlisten = await listen<PtyOutputPayload>(`pty-output-${sessionId}`, (event) => {
             terminal.write(event.payload.data);
           });
 
@@ -88,10 +74,7 @@ export function useTerminal(
       try {
         fitAddon.fit();
         const { cols, rows } = terminal;
-        const id = sessionIdRef.current;
-        if (id) {
-          void invoke('pty_resize', { sessionId: id, cols, rows });
-        }
+        void invoke('pty_resize', { sessionId, cols, rows });
       } catch {
         // Terminal may be disposed during cleanup
       }
@@ -105,15 +88,9 @@ export function useTerminal(
         unlistenFn();
       }
 
-      const id = sessionIdRef.current;
-      if (id) {
-        void invoke('pty_kill', { sessionId: id });
-      }
-
+      // Do NOT kill the PTY here — session store owns that lifecycle
       terminal.dispose();
       resizeObserver?.disconnect();
     };
-  }, [containerRef]);
-
-  return { sessionId };
+  }, [containerRef, sessionId]);
 }

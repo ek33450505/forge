@@ -1,0 +1,53 @@
+import { useEffect } from 'react';
+import { useLayoutStore } from '../store/layout';
+
+export function useKeyboardShortcuts(
+  onSplit?: (direction: 'horizontal' | 'vertical') => void,
+  onToggleSidebar?: () => void,
+) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const { closePane, setActivePane, getLeaves, activePaneId } =
+        useLayoutStore.getState();
+
+      // Cmd+D — split horizontal
+      if (e.metaKey && !e.shiftKey && e.key === 'd') {
+        e.preventDefault();
+        onSplit?.('horizontal');
+      }
+
+      // Cmd+Shift+D — split vertical
+      if (e.metaKey && e.shiftKey && e.key === 'D') {
+        e.preventDefault();
+        onSplit?.('vertical');
+      }
+
+      // Cmd+W — close active pane
+      if (e.metaKey && !e.shiftKey && e.key === 'w') {
+        e.preventDefault();
+        if (activePaneId) {
+          closePane(activePaneId);
+        }
+      }
+
+      // Cmd+B — toggle sidebar
+      if (e.metaKey && !e.shiftKey && e.key === 'b') {
+        e.preventDefault();
+        onToggleSidebar?.();
+      }
+
+      // Cmd+1 through Cmd+9 — switch to pane by index
+      if (e.metaKey && e.key >= '1' && e.key <= '9') {
+        e.preventDefault();
+        const leaves = getLeaves();
+        const index = parseInt(e.key, 10) - 1;
+        if (index < leaves.length) {
+          setActivePane(leaves[index].id);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onSplit, onToggleSidebar]);
+}

@@ -1,3 +1,4 @@
+mod config;
 mod pty;
 mod session;
 
@@ -22,6 +23,11 @@ pub fn run() {
             pty::pty_write,
             pty::pty_resize,
             pty::pty_kill,
+            config::config_read,
+            config::config_write,
+            session::session_list,
+            session::session_rename,
+            session::session_create_metadata,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
