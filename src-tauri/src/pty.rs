@@ -66,7 +66,8 @@ pub fn pty_create(
                         session_id: sid.clone(),
                         data,
                     };
-                    let _ = app_handle.emit("pty-output", payload);
+                    let event_name = format!("pty-output-{}", sid);
+                    let _ = app_handle.emit(&event_name, payload);
                 }
                 Err(e) => {
                     eprintln!("[forge] PTY reader error for session {}: {}", sid, e);

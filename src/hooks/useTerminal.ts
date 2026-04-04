@@ -66,10 +66,8 @@ export function useTerminal(
             }
           });
 
-          const unlisten = await listen<PtyOutputPayload>('pty-output', (event) => {
-            if (event.payload.session_id === sessionIdRef.current) {
-              terminal.write(event.payload.data);
-            }
+          const unlisten = await listen<PtyOutputPayload>(`pty-output-${id}`, (event) => {
+            terminal.write(event.payload.data);
           });
 
           if (!isMounted) {
