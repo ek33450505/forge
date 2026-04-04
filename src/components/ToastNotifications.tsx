@@ -5,11 +5,12 @@ import { useSessionStore } from '../store/sessions';
 import type { SessionExitPayload } from '../types/ipc';
 
 export function ToastNotifications() {
-  // Direct property access — never method selectors
-  const sessionIds = useSessionStore((s) => Object.keys(s.sessions));
+  // Use the sessions map directly — Object.keys() in a selector creates a new array each time
+  const sessions = useSessionStore((s) => s.sessions);
 
   useEffect(() => {
     const unlisten: Array<() => void> = [];
+    const sessionIds = Object.keys(sessions);
 
     for (const id of sessionIds) {
       listen<SessionExitPayload>(`session-exit-${id}`, (event) => {
@@ -23,7 +24,7 @@ export function ToastNotifications() {
 
     return () => unlisten.forEach((fn) => fn());
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionIds.join(',')]);
+  }, [sessions]);
 
   return (
     <Toaster
