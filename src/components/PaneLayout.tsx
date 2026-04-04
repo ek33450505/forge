@@ -65,19 +65,23 @@ export function PaneLayout() {
   const activeTabId = useLayoutStore((s) => s.activeTabId);
 
   return (
-    <>
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       {tabs.map((tab) => (
         <div
           key={tab.id}
           style={{
-            width: '100%',
-            height: '100%',
-            display: tab.id === activeTabId ? 'block' : 'none',
+            position: 'absolute',
+            inset: 0,
+            // Use visibility instead of display:none so xterm can always measure
+            // its container. display:none collapses dimensions to 0, which causes
+            // fitAddon.fit() to resize the terminal to 0 cols/rows — blank terminal.
+            visibility: tab.id === activeTabId ? 'visible' : 'hidden',
+            pointerEvents: tab.id === activeTabId ? 'auto' : 'none',
           }}
         >
           <PaneTree node={tab.root} />
         </div>
       ))}
-    </>
+    </div>
   );
 }

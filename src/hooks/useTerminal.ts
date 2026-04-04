@@ -134,6 +134,10 @@ export function useTerminal(
 
     resizeObserver = new ResizeObserver(() => {
       if (!isMounted) return;
+      // Skip fit when the container has zero dimensions — this happens when the
+      // tab is hidden via visibility:hidden or display:none. Fitting to a zero-
+      // size container would reset cols/rows to 0 and blank the terminal.
+      if (!containerRef.current || containerRef.current.offsetWidth === 0 || containerRef.current.offsetHeight === 0) return;
       try {
         fitAddon.fit();
         const { cols, rows } = terminal;
