@@ -7,8 +7,8 @@ interface PaneHeaderProps {
 }
 
 export function PaneHeader({ sessionId, isActive }: PaneHeaderProps) {
-  const session = useSessionStore((s) => s.getSession(sessionId));
-  const { type } = useSessionStore((s) => s.getSessionType(sessionId));
+  const session = useSessionStore((s) => s.sessions[sessionId]);
+  const type = useSessionStore((s) => s.sessionTypes[sessionId]?.type ?? 'unknown');
 
   const isClaude = type === 'claude';
   const name = session?.name ?? 'Shell';

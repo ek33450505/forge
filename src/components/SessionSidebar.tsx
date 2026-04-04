@@ -134,6 +134,7 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
   const setActivePane = useLayoutStore((s) => s.setActivePane);
   const sessions = useSessionStore((s) => s.sessions);
   const renameSession = useSessionStore((s) => s.renameSession);
+  const sessionTypes = useSessionStore((s) => s.sessionTypes);
   const getSessionType = useSessionStore((s) => s.getSessionType);
   const setSessionType = useSessionStore((s) => s.setSessionType);
 
@@ -215,7 +216,7 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
             {leaves.map((leaf, index) => {
               const session = sessions[leaf.sessionId];
               const name = session?.name ?? `Shell ${index + 1}`;
-              const { type: sessionType } = getSessionType(leaf.sessionId);
+              const sessionType = sessionTypes[leaf.sessionId]?.type ?? 'unknown';
               return (
                 <SidebarItem
                   key={leaf.id}

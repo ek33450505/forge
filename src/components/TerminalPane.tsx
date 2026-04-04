@@ -14,7 +14,7 @@ export function TerminalPane({ sessionId, isActive, onFocus }: TerminalPaneProps
   const containerRef = useRef<HTMLDivElement>(null);
   useTerminal(containerRef, sessionId);
 
-  const { type } = useSessionStore((s) => s.getSessionType(sessionId));
+  const type = useSessionStore((s) => s.sessionTypes[sessionId]?.type ?? 'unknown');
   const isClaude = type === 'claude';
 
   return (
