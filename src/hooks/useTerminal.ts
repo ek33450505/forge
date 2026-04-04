@@ -2,10 +2,31 @@ import { useEffect, useRef } from 'react';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
+import { SearchAddon } from '@xterm/addon-search';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import type { PtyOutputPayload } from '../types/ipc';
 import { useThemeStore, resolveTheme } from '../store/theme';
+
+/** Module-level map so TerminalSearch can access the SearchAddon per session */
+export const searchAddonMap = new Map<string, SearchAddon>();
+
+/** Module-level event bus for terminal input — ghost suggestion tracks line buffer */
+export const terminalInputEmitter = new EventTarget();
+
+/** Dispatch a custom event when user types in a terminal */
+export function emitTerminalInput(sessionId: string, lineBuffer: string) {
+  terminalInputEmitter.dispatchEvent(
+    new CustomEvent('terminal-input', { detail: { sessionId, lineBuffer } }),
+  );
+}
+
+/** Dispatch a custom event when a command is submitted (Enter pressed) */
+export function emitTerminalSubmit(sessionId: string, command: string) {
+  terminalInputEmitter.dispatchEvent(
+    new CustomEvent('terminal-submit', { detail: { sessionId, command } }),
+  );
+}
 
 export function useTerminal(
   containerRef: React.RefObject<HTMLDivElement | null>,
@@ -37,10 +58,14 @@ export function useTerminal(
 
     const fitAddon = new FitAddon();
     const webLinksAddon = new WebLinksAddon();
+    const searchAddon = new SearchAddon();
 
     terminal.loadAddon(fitAddon);
     terminal.loadAddon(webLinksAddon);
+    terminal.loadAddon(searchAddon);
     terminal.open(containerRef.current);
+
+    searchAddonMap.set(sessionId, searchAddon);
 
     let unlistenFn: (() => void) | null = null;
     let resizeObserver: ResizeObserver | null = null;
@@ -53,11 +78,37 @@ export function useTerminal(
 
       (async () => {
         try {
-          // 1. Wire up input first
+          // 1. Wire up input first — also track line buffer for ghost suggestions
+          let lineBuffer = '';
           terminal.onData((data) => {
-            if (isMounted) {
-              void invoke('pty_write', { sessionId, data });
+            if (!isMounted) return;
+
+            // Track line buffer for ghost-text suggestions
+            if (data === '\r' || data === '\n') {
+              // Enter pressed — submit command and reset buffer
+              if (lineBuffer.trim()) {
+                emitTerminalSubmit(sessionId, lineBuffer);
+              }
+              lineBuffer = '';
+              emitTerminalInput(sessionId, '');
+            } else if (data === '\x7f' || data === '\b') {
+              // Backspace
+              lineBuffer = lineBuffer.slice(0, -1);
+              emitTerminalInput(sessionId, lineBuffer);
+            } else if (data === '\x03') {
+              // Ctrl+C — reset buffer
+              lineBuffer = '';
+              emitTerminalInput(sessionId, '');
+            } else if (data === '\t') {
+              // Tab — handled by ghost suggestion accept, still forward to PTY
+              // Ghost hook will intercept via its own listener
+            } else if (data.length === 1 && data >= ' ') {
+              // Printable character
+              lineBuffer += data;
+              emitTerminalInput(sessionId, lineBuffer);
             }
+
+            void invoke('pty_write', { sessionId, data });
           });
 
           // 2. Start listening for output BEFORE resize
@@ -96,6 +147,7 @@ export function useTerminal(
     return () => {
       isMounted = false;
       terminalRef.current = null;
+      searchAddonMap.delete(sessionId);
 
       if (unlistenFn) {
         unlistenFn();

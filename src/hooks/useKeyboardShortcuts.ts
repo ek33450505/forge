@@ -2,8 +2,10 @@ import { useEffect } from 'react';
 import { useLayoutStore } from '../store/layout';
 import { useCastStore } from '../store/cast';
 import { useAgentOutputStore } from '../store/agentOutput';
+import { useTerminalSearchStore } from '../store/terminalSearch';
 
 export function useKeyboardShortcuts(
+  onNewTab?: () => void,
   onSplit?: (direction: 'horizontal' | 'vertical') => void,
   onToggleSidebar?: () => void,
   onToggleInfoPanel?: () => void,
@@ -16,34 +18,41 @@ export function useKeyboardShortcuts(
       const { closePane, setActivePane, getLeaves, activePaneId } =
         useLayoutStore.getState();
 
+      // Cmd+F — terminal search
+      if (e.metaKey && !e.shiftKey && e.key === 'f') {
+        e.preventDefault();
+        useTerminalSearchStore.getState().toggle();
+      }
+
       // Cmd+K — command palette
       if (e.metaKey && !e.shiftKey && e.key === 'k') {
         e.preventDefault();
         onToggleCommandPalette?.();
       }
 
-      // Cmd+T — new tab (same as new session)
+      // Cmd+T — new tab (independent session, not a split)
       if (e.metaKey && !e.shiftKey && e.key === 't') {
         e.preventDefault();
-        onSplit?.('horizontal');
+        onNewTab?.();
       }
 
-      // Cmd+D — split horizontal
+      // Cmd+D — split horizontal within active tab
       if (e.metaKey && !e.shiftKey && e.key === 'd') {
         e.preventDefault();
         onSplit?.('horizontal');
       }
 
-      // Cmd+Shift+D — split vertical
+      // Cmd+Shift+D — split vertical within active tab
       if (e.metaKey && e.shiftKey && e.key === 'D') {
         e.preventDefault();
         onSplit?.('vertical');
       }
 
-      // Cmd+W — close active pane
+      // Cmd+W — close active pane (or tab if last pane)
       if (e.metaKey && !e.shiftKey && e.key === 'w') {
         e.preventDefault();
         if (activePaneId) {
+          // closePane handles tab-close when it is the last leaf
           closePane(activePaneId);
         }
       }
@@ -87,7 +96,7 @@ export function useKeyboardShortcuts(
         }
       }
 
-      // Cmd+1 through Cmd+9 — switch to pane by index
+      // Cmd+1 through Cmd+9 — switch to pane by index (within active tab)
       if (e.metaKey && e.key >= '1' && e.key <= '9') {
         e.preventDefault();
         const leaves = getLeaves();
@@ -100,5 +109,5 @@ export function useKeyboardShortcuts(
 
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [onSplit, onToggleSidebar, onToggleInfoPanel, onToggleShortcutHints, onToggleCommandPalette, onToggleSettings]);
+  }, [onNewTab, onSplit, onToggleSidebar, onToggleInfoPanel, onToggleShortcutHints, onToggleCommandPalette, onToggleSettings]);
 }

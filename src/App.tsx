@@ -13,6 +13,8 @@ import { SettingsPanel } from './components/SettingsPanel';
 import { useLayoutStore } from './store/layout';
 import { useSessionStore } from './store/sessions';
 import { useCommandHistoryStore } from './store/commandHistory';
+import { useTerminalSearchStore } from './store/terminalSearch';
+import { useNotificationSettingsStore } from './store/notificationSettings';
 import { overwriteCommand, type Command as ForgeCommand } from './lib/commands';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useProcessInspection } from './hooks/useProcessInspection';
@@ -49,7 +51,7 @@ function App() {
 
   const initialize = useLayoutStore((s) => s.initialize);
   const splitPane = useLayoutStore((s) => s.splitPane);
-  const root = useLayoutStore((s) => s.root);
+  const tabs = useLayoutStore((s) => s.tabs);
   const activePaneId = useLayoutStore((s) => s.activePaneId);
   const addSession = useSessionStore((s) => s.addSession);
 
@@ -91,9 +93,9 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // When the last pane is closed, open a new default session
+  // When the last tab is closed, open a new default session (respawn)
   useEffect(() => {
-    if (!ready || root !== null) return;
+    if (!ready || tabs.length > 0) return;
 
     void (async () => {
       const sessionId = await invoke<string>('pty_create', {
@@ -111,8 +113,25 @@ function App() {
       initialize(paneId, sessionId);
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [root, ready]);
+  }, [tabs.length, ready]);
 
+  // Creates an independent new tab (browser-style)
+  const handleNewTab = useCallback(async () => {
+    const sessionId = await invoke<string>('pty_create', {
+      shell: '/bin/zsh',
+      cols: 80,
+      rows: 24,
+    });
+    addSession({
+      id: sessionId,
+      name: nextShellName(),
+      shell: '/bin/zsh',
+      created_at: Date.now() / 1000,
+    });
+    useLayoutStore.getState().addTab(sessionId);
+  }, [addSession]);
+
+  // Splits within the active tab
   const handleSplit = useCallback(
     async (direction: 'horizontal' | 'vertical') => {
       if (!activePaneId) return;
@@ -165,14 +184,14 @@ function App() {
       id: 'new-session',
       label: 'New Session',
       group: 'Layout',
-      handler: () => { void handleSplit('horizontal'); },
+      handler: () => { void handleNewTab(); },
     });
     overwriteCommand({
       id: 'new-tab',
       label: 'New Tab',
       group: 'Layout',
       keybind: '⌘T',
-      handler: () => { void handleSplit('horizontal'); },
+      handler: () => { void handleNewTab(); },
     });
     overwriteCommand({
       id: 'split-horizontal',
@@ -194,7 +213,11 @@ function App() {
       group: 'Layout',
       keybind: '⌘W',
       handler: () => {
-        useLayoutStore.getState().closePane(useLayoutStore.getState().activePaneId ?? '');
+        const state = useLayoutStore.getState();
+        const currentPaneId = state.activePaneId;
+        if (!currentPaneId) return;
+        // closePane already handles tab-closing when the tab has only one leaf
+        state.closePane(currentPaneId);
       },
     });
     overwriteCommand({
@@ -246,6 +269,22 @@ function App() {
       },
     });
     overwriteCommand({
+      id: 'search-terminal',
+      label: 'Search Terminal Output',
+      group: 'Terminal',
+      keybind: '⌘F',
+      handler: () => { useTerminalSearchStore.getState().toggle(); },
+    });
+    overwriteCommand({
+      id: 'toggle-completion-notify',
+      label: 'Toggle Completion Notification (this pane)',
+      group: 'Terminal',
+      handler: () => {
+        const id = useLayoutStore.getState().activePaneId;
+        if (id) useNotificationSettingsStore.getState().togglePane(id);
+      },
+    });
+    overwriteCommand({
       id: 'cast.refresh',
       label: 'Refresh CAST Data',
       group: 'CAST',
@@ -258,7 +297,7 @@ function App() {
         }
       },
     });
-  }, [handleSplit]);
+  }, [handleNewTab, handleSplit]);
 
   const handleExecuteCommand = useCallback(
     (cmd: ForgeCommand | { id: string; label: string; group: 'Session'; sessionId: string }) => {
@@ -273,7 +312,7 @@ function App() {
 
   const feedOpen = useCastStore((s) => s.feedOpen);
 
-  useKeyboardShortcuts(handleSplit, handleToggleSidebar, handleToggleInfoPanel, handleToggleShortcutHints, handleToggleCommandPalette, handleToggleSettings);
+  useKeyboardShortcuts(handleNewTab, handleSplit, handleToggleSidebar, handleToggleInfoPanel, handleToggleShortcutHints, handleToggleCommandPalette, handleToggleSettings);
   useProcessInspection();
   useClaudeDetection();
   useCastFeed();
@@ -313,19 +352,17 @@ function App() {
         <span>Forge</span>
       </div>
 
-      {/* Tab bar */}
-      <TabBar
-        onNewSession={() => { void handleSplit('horizontal'); }}
-        onCloseSession={(paneId) => { useLayoutStore.getState().closePane(paneId); }}
-      />
-
       {/* Main content: sidebar + panes + info panel */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         <SessionSidebar
           collapsed={sidebarCollapsed}
           onToggle={handleToggleSidebar}
         />
-        <div style={{ flex: 1, overflow: 'hidden' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <TabBar
+            onNewTab={() => { void handleNewTab(); }}
+            onCloseTab={(tabId) => { useLayoutStore.getState().closeTab(tabId); }}
+          />
           {ready && <PaneLayout />}
         </div>
         {feedOpen && <AgentFeed />}

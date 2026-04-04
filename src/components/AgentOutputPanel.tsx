@@ -15,7 +15,7 @@ export function AgentOutputPanel() {
   const blocks = useAgentOutputStore((s) => s.blocks);
   const setPanelOpen = useAgentOutputStore((s) => s.setPanelOpen);
   const clearSession = useAgentOutputStore((s) => s.clearSession);
-  const root = useLayoutStore((s) => s.root);
+  const root = useLayoutStore((s) => s.getActiveTab()?.root ?? null);
   const activePaneId = useLayoutStore((s) => s.activePaneId);
   const sessionTypes = useSessionStore((s) => s.sessionTypes);
 

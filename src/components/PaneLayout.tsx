@@ -13,6 +13,7 @@ function PaneLeaf({ node }: PaneLeafProps) {
 
   return (
     <TerminalPane
+      paneId={node.id}
       sessionId={node.sessionId}
       isActive={activePaneId === node.id}
       onFocus={() => { setActivePane(node.id); }}
@@ -60,13 +61,23 @@ function PaneTree({ node }: PaneTreeProps) {
 }
 
 export function PaneLayout() {
-  const root = useLayoutStore((s) => s.root);
-
-  if (!root) return null;
+  const tabs = useLayoutStore((s) => s.tabs);
+  const activeTabId = useLayoutStore((s) => s.activeTabId);
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
-      <PaneTree node={root} />
-    </div>
+    <>
+      {tabs.map((tab) => (
+        <div
+          key={tab.id}
+          style={{
+            width: '100%',
+            height: '100%',
+            display: tab.id === activeTabId ? 'block' : 'none',
+          }}
+        >
+          <PaneTree node={tab.root} />
+        </div>
+      ))}
+    </>
   );
 }

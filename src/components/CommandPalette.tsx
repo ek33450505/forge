@@ -89,12 +89,32 @@ export function CommandPalette({ open, onClose, onExecute }: Props) {
   }));
 
   function handleSessionSwitch(cmd: SessionSwitchCommand) {
-    const leaves = useLayoutStore.getState().getLeaves();
-    const leaf = leaves.find((l) => l.sessionId === cmd.sessionId);
+    const state = useLayoutStore.getState();
+    // Search all tabs to find the leaf, then switch to its tab + pane
+    const allLeaves = state.getAllLeaves();
+    const leaf = allLeaves.find((l) => l.sessionId === cmd.sessionId);
     if (leaf) {
-      useLayoutStore.getState().setActivePane(leaf.id);
+      const targetTab = state.tabs.find((t) =>
+        state.getAllLeaves().filter((l) =>
+          // Re-collect for that specific tab's root
+          collectLeavesFromTab(t).some((tl) => tl.id === leaf.id)
+        ).length > 0
+      );
+      if (targetTab && targetTab.id !== state.activeTabId) {
+        state.setActiveTab(targetTab.id);
+      }
+      state.setActivePane(leaf.id);
     }
     onClose();
+  }
+
+  // Helper to collect leaves from a single tab's root
+  function collectLeavesFromTab(tab: { root: import('../store/layout').PaneNode }): import('../store/layout').LeafNode[] {
+    function collect(node: import('../store/layout').PaneNode): import('../store/layout').LeafNode[] {
+      if (node.type === 'leaf') return [node];
+      return [...collect(node.children[0]), ...collect(node.children[1])];
+    }
+    return collect(tab.root);
   }
 
   const itemStyle: React.CSSProperties = {

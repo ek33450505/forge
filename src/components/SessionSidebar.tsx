@@ -4,7 +4,6 @@ import { useSessionStore } from '../store/sessions';
 import type { LeafNode } from '../store/layout';
 import { SessionBadge } from './SessionBadge';
 import { SessionTypeMenu } from './SessionTypeMenu';
-import { Ember } from './Ember';
 import type { SessionType } from '../types/sessions';
 
 function collectLeavesFromRoot(node: import('../store/layout').PaneNode): LeafNode[] {
@@ -132,8 +131,10 @@ interface ContextMenuState {
 }
 
 export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
-  const root = useLayoutStore((s) => s.root);
+  const tabs = useLayoutStore((s) => s.tabs);
+  const activeTabId = useLayoutStore((s) => s.activeTabId);
   const activePaneId = useLayoutStore((s) => s.activePaneId);
+  const setActiveTab = useLayoutStore((s) => s.setActiveTab);
   const setActivePane = useLayoutStore((s) => s.setActivePane);
   const sessions = useSessionStore((s) => s.sessions);
   const renameSession = useSessionStore((s) => s.renameSession);
@@ -143,7 +144,21 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
 
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
-  const leaves = root ? collectLeavesFromRoot(root) : [];
+  // Collect leaves from ALL tabs so all sessions are visible in the sidebar
+  const leaves = tabs.flatMap((t) => collectLeavesFromRoot(t.root));
+
+  // When clicking a session in the sidebar, find which tab contains it, switch
+  // to that tab, and set the pane active.
+  function handleSelectLeaf(leafId: string) {
+    const targetTab = tabs.find((t) =>
+      collectLeavesFromRoot(t.root).some((l) => l.id === leafId)
+    );
+    if (!targetTab) return;
+    if (targetTab.id !== activeTabId) {
+      setActiveTab(targetTab.id);
+    }
+    setActivePane(leafId);
+  }
 
   return (
     <div
@@ -229,7 +244,7 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
                   name={name}
                   isActive={activePaneId === leaf.id}
                   sessionType={sessionType}
-                  onSelect={() => { setActivePane(leaf.id); }}
+                  onSelect={() => { handleSelectLeaf(leaf.id); }}
                   onRename={(newName) => { renameSession(leaf.sessionId, newName); }}
                   onContextMenu={(e) => {
                     e.preventDefault();
@@ -238,19 +253,6 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
                 />
               );
             })}
-          </div>
-          {/* Ember mascot */}
-          <div
-            style={{
-              height: '64px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderTop: '1px solid var(--sidebar-border)',
-              flexShrink: 0,
-            }}
-          >
-            <Ember />
           </div>
         </>
       )}

@@ -1,26 +1,18 @@
 import { useLayoutStore } from '../store/layout';
 import { useSessionStore } from '../store/sessions';
 import { SessionBadge } from './SessionBadge';
-import type { LeafNode, PaneNode } from '../store/layout';
-
-function collectLeavesFromRoot(node: PaneNode): LeafNode[] {
-  if (node.type === 'leaf') return [node];
-  return [...collectLeavesFromRoot(node.children[0]), ...collectLeavesFromRoot(node.children[1])];
-}
 
 interface TabBarProps {
-  onNewSession: () => void;
-  onCloseSession: (paneId: string) => void;
+  onNewTab: () => void;
+  onCloseTab: (tabId: string) => void;
 }
 
-export function TabBar({ onNewSession, onCloseSession }: TabBarProps) {
-  const root = useLayoutStore((s) => s.root);
-  const activePaneId = useLayoutStore((s) => s.activePaneId);
-  const setActivePane = useLayoutStore((s) => s.setActivePane);
+export function TabBar({ onNewTab, onCloseTab }: TabBarProps) {
+  const tabs = useLayoutStore((s) => s.tabs);
+  const activeTabId = useLayoutStore((s) => s.activeTabId);
+  const setActiveTab = useLayoutStore((s) => s.setActiveTab);
   const sessions = useSessionStore((s) => s.sessions);
   const sessionTypes = useSessionStore((s) => s.sessionTypes);
-
-  const leaves = root ? collectLeavesFromRoot(root) : [];
 
   return (
     <div
@@ -36,25 +28,35 @@ export function TabBar({ onNewSession, onCloseSession }: TabBarProps) {
         scrollbarWidth: 'none',
       }}
     >
-      {leaves.map((leaf) => {
-        const isActive = activePaneId === leaf.id;
-        const session = sessions[leaf.sessionId];
+      {tabs.map((tab) => {
+        const isActive = activeTabId === tab.id;
+
+        // Use the first leaf's session for display
+        function getFirstLeafSessionId(node: import('../store/layout').PaneNode): string | null {
+          if (node.type === 'leaf') return node.sessionId;
+          return getFirstLeafSessionId(node.children[0]);
+        }
+
+        const primarySessionId = getFirstLeafSessionId(tab.root);
+        const session = primarySessionId ? sessions[primarySessionId] : undefined;
         const name = session?.name ?? 'Shell';
-        const sessionType = sessionTypes[leaf.sessionId]?.type ?? 'unknown';
+        const sessionType = primarySessionId
+          ? (sessionTypes[primarySessionId]?.type ?? 'unknown')
+          : 'unknown';
         const isClaude = sessionType === 'claude';
 
         return (
           <div
-            key={leaf.id}
+            key={tab.id}
             onMouseDown={(e) => {
               // Middle-click to close
               if (e.button === 1) {
                 e.preventDefault();
-                onCloseSession(leaf.id);
+                onCloseTab(tab.id);
                 return;
               }
               if (e.button === 0) {
-                setActivePane(leaf.id);
+                setActiveTab(tab.id);
               }
             }}
             style={{
@@ -91,7 +93,7 @@ export function TabBar({ onNewSession, onCloseSession }: TabBarProps) {
             <button
               onMouseDown={(e) => {
                 e.stopPropagation();
-                onCloseSession(leaf.id);
+                onCloseTab(tab.id);
               }}
               className="tab-close-btn"
               style={{
@@ -116,7 +118,7 @@ export function TabBar({ onNewSession, onCloseSession }: TabBarProps) {
 
       {/* New tab button */}
       <button
-        onClick={onNewSession}
+        onClick={onNewTab}
         style={{
           background: 'none',
           border: 'none',
