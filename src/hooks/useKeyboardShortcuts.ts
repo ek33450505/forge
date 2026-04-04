@@ -6,11 +6,18 @@ export function useKeyboardShortcuts(
   onToggleSidebar?: () => void,
   onToggleInfoPanel?: () => void,
   onToggleShortcutHints?: () => void,
+  onToggleCommandPalette?: () => void,
 ) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const { closePane, setActivePane, getLeaves, activePaneId } =
         useLayoutStore.getState();
+
+      // Cmd+K — command palette
+      if (e.metaKey && !e.shiftKey && e.key === 'k') {
+        e.preventDefault();
+        onToggleCommandPalette?.();
+      }
 
       // Cmd+D — split horizontal
       if (e.metaKey && !e.shiftKey && e.key === 'd') {
@@ -63,5 +70,5 @@ export function useKeyboardShortcuts(
 
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [onSplit, onToggleSidebar, onToggleInfoPanel, onToggleShortcutHints]);
+  }, [onSplit, onToggleSidebar, onToggleInfoPanel, onToggleShortcutHints, onToggleCommandPalette]);
 }

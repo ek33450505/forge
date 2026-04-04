@@ -1,13 +1,17 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
+import { toast } from 'sonner';
 import { PaneLayout } from './components/PaneLayout';
 import { SessionSidebar } from './components/SessionSidebar';
 import { StatusBar } from './components/StatusBar';
 import { InfoPanel } from './components/InfoPanel';
 import { ToastNotifications } from './components/ToastNotifications';
 import { ShortcutHints } from './components/ShortcutHints';
+import { CommandPalette } from './components/CommandPalette';
 import { useLayoutStore } from './store/layout';
 import { useSessionStore } from './store/sessions';
+import { useCommandHistoryStore } from './store/commandHistory';
+import { overwriteCommand, type Command as ForgeCommand } from './lib/commands';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useProcessInspection } from './hooks/useProcessInspection';
 import { useClaudeDetection } from './hooks/useClaudeDetection';
@@ -24,6 +28,7 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [infoPanelOpen, setInfoPanelOpen] = useState(false);
   const [shortcutHintsVisible, setShortcutHintsVisible] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const initialized = useRef(false);
 
   const initialize = useLayoutStore((s) => s.initialize);
@@ -117,7 +122,88 @@ function App() {
     setShortcutHintsVisible((prev) => !prev);
   }, []);
 
-  useKeyboardShortcuts(handleSplit, handleToggleSidebar, handleToggleInfoPanel, handleToggleShortcutHints);
+  const handleToggleCommandPalette = useCallback(() => {
+    setCommandPaletteOpen((prev) => !prev);
+  }, []);
+
+  const handleCloseCommandPalette = useCallback(() => {
+    setCommandPaletteOpen(false);
+  }, []);
+
+  // Register built-in commands — use overwriteCommand for StrictMode idempotency
+  useEffect(() => {
+    overwriteCommand({
+      id: 'new-session',
+      label: 'New Session',
+      group: 'Layout',
+      handler: () => { void handleSplit('horizontal'); },
+    });
+    overwriteCommand({
+      id: 'split-horizontal',
+      label: 'Split Horizontal',
+      group: 'Layout',
+      keybind: '⌘D',
+      handler: () => { void handleSplit('horizontal'); },
+    });
+    overwriteCommand({
+      id: 'split-vertical',
+      label: 'Split Vertical',
+      group: 'Layout',
+      keybind: '⌘⇧D',
+      handler: () => { void handleSplit('vertical'); },
+    });
+    overwriteCommand({
+      id: 'close-pane',
+      label: 'Close Pane',
+      group: 'Layout',
+      keybind: '⌘W',
+      handler: () => {
+        useLayoutStore.getState().closePane(activePaneId ?? '');
+      },
+    });
+    overwriteCommand({
+      id: 'rename-session',
+      label: 'Rename Session',
+      group: 'Session',
+      handler: () => {
+        const activeSessionId = useLayoutStore
+          .getState()
+          .getLeaves()
+          .find((l) => l.id === activePaneId)?.sessionId;
+        if (!activeSessionId) return;
+        const name = window.prompt('Rename session:');
+        if (name) {
+          useSessionStore.getState().renameSession(activeSessionId, name);
+        }
+      },
+    });
+    overwriteCommand({
+      id: 'switch-theme',
+      label: 'Switch Theme',
+      group: 'Settings',
+      handler: () => { toast.info('Themes coming in Phase 6'); },
+    });
+    overwriteCommand({
+      id: 'open-settings',
+      label: 'Open Settings',
+      group: 'Settings',
+      keybind: '⌘,',
+      handler: () => { toast.info('Settings coming in Phase 6'); },
+    });
+  }, [activePaneId, handleSplit]);
+
+  const handleExecuteCommand = useCallback(
+    (cmd: ForgeCommand | { id: string; label: string; group: 'Session'; sessionId: string }) => {
+      if ('handler' in cmd) {
+        cmd.handler();
+      }
+      useCommandHistoryStore.getState().pushCommand(cmd.id);
+      setCommandPaletteOpen(false);
+    },
+    [],
+  );
+
+  useKeyboardShortcuts(handleSplit, handleToggleSidebar, handleToggleInfoPanel, handleToggleShortcutHints, handleToggleCommandPalette);
   useProcessInspection();
   useClaudeDetection();
   useCastFeed();
@@ -169,6 +255,13 @@ function App() {
 
       {/* Status bar — bottom of outer column */}
       <StatusBar onToggleInfoPanel={handleToggleInfoPanel} />
+
+      {/* Command palette overlay */}
+      <CommandPalette
+        open={commandPaletteOpen}
+        onClose={handleCloseCommandPalette}
+        onExecute={handleExecuteCommand}
+      />
 
       {/* Toast portal */}
       <ToastNotifications />
