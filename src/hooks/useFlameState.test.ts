@@ -12,7 +12,7 @@ function deriveFlameState(
 ): 'idle' | 'active' | 'complete' | 'error' {
   const entries = Object.values(sessionTypes);
   const hasClaudeSession = entries.some((e) => e.type === 'claude');
-  const hasCastSession = entries.some((e) => (e.type as string) === 'cast');
+  const hasCastSession = entries.some((e) => e.type === 'cast');
 
   if (hasCastSession && castFeedEnabled) return 'active';
   if (hasClaudeSession) return 'active';
@@ -39,15 +39,15 @@ describe('useFlameState derivation logic', () => {
   });
 
   it('returns active when cast session exists and castFeedEnabled', () => {
-    const sessionTypes = {
-      'session-1': { type: 'cast', manualOverride: false } as SessionTypeEntry,
+    const sessionTypes: MockSessionTypes = {
+      'session-1': { type: 'cast', manualOverride: false },
     };
     expect(deriveFlameState(sessionTypes, true)).toBe('active');
   });
 
   it('returns idle when cast session exists but castFeedEnabled is false', () => {
-    const sessionTypes = {
-      'session-1': { type: 'cast', manualOverride: false } as SessionTypeEntry,
+    const sessionTypes: MockSessionTypes = {
+      'session-1': { type: 'cast', manualOverride: false },
     };
     expect(deriveFlameState(sessionTypes, false)).toBe('idle');
   });

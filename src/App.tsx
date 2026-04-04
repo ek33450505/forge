@@ -1,12 +1,10 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { toast } from 'sonner';
 import { PaneLayout } from './components/PaneLayout';
 import { SessionSidebar } from './components/SessionSidebar';
 import { StatusBar } from './components/StatusBar';
 import { InfoPanel } from './components/InfoPanel';
 import { ToastNotifications } from './components/ToastNotifications';
-import { ShortcutHints } from './components/ShortcutHints';
 import { CommandPalette } from './components/CommandPalette';
 import { Flame } from './components/Flame';
 import { SettingsPanel } from './components/SettingsPanel';
@@ -44,7 +42,6 @@ function App() {
   const [ready, setReady] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [infoPanelOpen, setInfoPanelOpen] = useState(false);
-  const [shortcutHintsVisible, setShortcutHintsVisible] = useState(false);
   const [shortcutRefOpen, setShortcutRefOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [settingsPanelOpen, setSettingsPanelOpen] = useState(false);
@@ -161,10 +158,6 @@ function App() {
 
   const handleToggleInfoPanel = useCallback(() => {
     setInfoPanelOpen((prev) => !prev);
-  }, []);
-
-  const handleToggleShortcutHints = useCallback(() => {
-    setShortcutHintsVisible((prev) => !prev);
   }, []);
 
   const handleToggleShortcutRef = useCallback(() => {
@@ -382,9 +375,6 @@ function App() {
         <AgentOutputPanel />
         <InfoPanel open={infoPanelOpen} onClose={handleToggleInfoPanel} />
       </div>
-
-      {/* Shortcut hints strip — above status bar */}
-      <ShortcutHints visible={shortcutHintsVisible} />
 
       {/* Status bar — bottom of outer column */}
       <StatusBar

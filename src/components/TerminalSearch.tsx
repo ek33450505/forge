@@ -40,36 +40,41 @@ export function TerminalSearch({ sessionId }: TerminalSearchProps) {
       return;
     }
 
-    const result = addon.findNext(query, {
+    // Subscribe to result change events for match index/count
+    const disposable = addon.onDidChangeResults((event) => {
+      if (event) {
+        setMatchInfo(event.resultIndex + 1, event.resultCount);
+      } else {
+        setMatchInfo(0, 0);
+      }
+    });
+
+    const found = addon.findNext(query, {
       caseSensitive,
       regex: useRegex,
       incremental: true,
     });
 
-    if (result) {
-      setMatchInfo(result.resultIndex + 1, result.resultCount);
-    } else {
+    if (!found) {
       setMatchInfo(0, 0);
     }
+
+    return () => disposable.dispose();
   }, [query, caseSensitive, useRegex, open, sessionId, setMatchInfo]);
 
   const handleNext = useCallback(() => {
     const addon = searchAddonMap.get(sessionId);
     if (!addon || !query) return;
-    const result = addon.findNext(query, { caseSensitive, regex: useRegex });
-    if (result) {
-      setMatchInfo(result.resultIndex + 1, result.resultCount);
-    }
-  }, [sessionId, query, caseSensitive, useRegex, setMatchInfo]);
+    addon.findNext(query, { caseSensitive, regex: useRegex });
+    // Match info is updated via onDidChangeResults in the search effect
+  }, [sessionId, query, caseSensitive, useRegex]);
 
   const handlePrevious = useCallback(() => {
     const addon = searchAddonMap.get(sessionId);
     if (!addon || !query) return;
-    const result = addon.findPrevious(query, { caseSensitive, regex: useRegex });
-    if (result) {
-      setMatchInfo(result.resultIndex + 1, result.resultCount);
-    }
-  }, [sessionId, query, caseSensitive, useRegex, setMatchInfo]);
+    addon.findPrevious(query, { caseSensitive, regex: useRegex });
+    // Match info is updated via onDidChangeResults in the search effect
+  }, [sessionId, query, caseSensitive, useRegex]);
 
   const handleClose = useCallback(() => {
     const addon = searchAddonMap.get(sessionId);

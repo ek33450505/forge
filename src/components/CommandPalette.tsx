@@ -95,10 +95,8 @@ export function CommandPalette({ open, onClose, onExecute }: Props) {
     const leaf = allLeaves.find((l) => l.sessionId === cmd.sessionId);
     if (leaf) {
       const targetTab = state.tabs.find((t) =>
-        state.getAllLeaves().filter((l) =>
-          // Re-collect for that specific tab's root
-          collectLeavesFromTab(t).some((tl) => tl.id === leaf.id)
-        ).length > 0
+        // Check if this tab's own leaf tree contains the target leaf
+        collectLeavesFromTab(t).some((tl) => tl.id === leaf.id)
       );
       if (targetTab && targetTab.id !== state.activeTabId) {
         state.setActiveTab(targetTab.id);

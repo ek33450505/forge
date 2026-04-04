@@ -1,4 +1,4 @@
-export type SessionType = 'shell' | 'claude' | 'unknown';
+export type SessionType = 'shell' | 'claude' | 'cast' | 'unknown';
 
 export interface SessionTypeEntry {
   type: SessionType;
