@@ -45,6 +45,7 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [infoPanelOpen, setInfoPanelOpen] = useState(false);
   const [shortcutHintsVisible, setShortcutHintsVisible] = useState(false);
+  const [shortcutRefOpen, setShortcutRefOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [settingsPanelOpen, setSettingsPanelOpen] = useState(false);
   const initialized = useRef(false);
@@ -166,6 +167,10 @@ function App() {
     setShortcutHintsVisible((prev) => !prev);
   }, []);
 
+  const handleToggleShortcutRef = useCallback(() => {
+    setShortcutRefOpen((prev) => !prev);
+  }, []);
+
   const handleToggleCommandPalette = useCallback(() => {
     setCommandPaletteOpen((prev) => !prev);
   }, []);
@@ -276,6 +281,14 @@ function App() {
       handler: () => { useTerminalSearchStore.getState().toggle(); },
     });
     overwriteCommand({
+      id: 'show-shortcuts',
+      label: 'Show Keyboard Shortcuts',
+      group: 'Tools',
+      keybind: '⌘/',
+      keywords: ['keyboard', 'shortcuts', 'help', 'bindings', 'hotkeys'],
+      handler: () => { setShortcutRefOpen((prev) => !prev); },
+    });
+    overwriteCommand({
       id: 'toggle-completion-notify',
       label: 'Toggle Completion Notification (this pane)',
       group: 'Terminal',
@@ -312,7 +325,7 @@ function App() {
 
   const feedOpen = useCastStore((s) => s.feedOpen);
 
-  useKeyboardShortcuts(handleNewTab, handleSplit, handleToggleSidebar, handleToggleInfoPanel, handleToggleShortcutHints, handleToggleCommandPalette, handleToggleSettings);
+  useKeyboardShortcuts(handleNewTab, handleSplit, handleToggleSidebar, handleToggleInfoPanel, handleToggleShortcutRef, handleToggleCommandPalette, handleToggleSettings);
   useProcessInspection();
   useClaudeDetection();
   useCastFeed();
@@ -374,7 +387,11 @@ function App() {
       <ShortcutHints visible={shortcutHintsVisible} />
 
       {/* Status bar — bottom of outer column */}
-      <StatusBar onToggleInfoPanel={handleToggleInfoPanel} />
+      <StatusBar
+        onToggleInfoPanel={handleToggleInfoPanel}
+        shortcutRefOpen={shortcutRefOpen}
+        onToggleShortcutRef={handleToggleShortcutRef}
+      />
 
       {/* Command palette overlay */}
       <CommandPalette

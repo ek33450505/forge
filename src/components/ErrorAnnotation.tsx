@@ -5,10 +5,14 @@ interface ErrorAnnotationProps {
 }
 
 export function ErrorAnnotation({ sessionId }: ErrorAnnotationProps) {
-  const annotations = useErrorAnnotationStore(
-    (s) => s.annotations[sessionId]?.filter((a) => !a.dismissed) ?? [],
+  // Select the whole annotation array for this session — .filter() inside a
+  // selector returns a new array on every call which makes Zustand's Object.is
+  // check always fail, causing an infinite re-render loop. Filter in render.
+  const allAnnotations = useErrorAnnotationStore(
+    (s) => s.annotations[sessionId] ?? null,
   );
   const dismiss = useErrorAnnotationStore((s) => s.dismiss);
+  const annotations = allAnnotations ? allAnnotations.filter((a) => !a.dismissed) : [];
 
   if (annotations.length === 0) return null;
 

@@ -15,7 +15,10 @@ export function AgentOutputPanel() {
   const blocks = useAgentOutputStore((s) => s.blocks);
   const setPanelOpen = useAgentOutputStore((s) => s.setPanelOpen);
   const clearSession = useAgentOutputStore((s) => s.clearSession);
-  const root = useLayoutStore((s) => s.getActiveTab()?.root ?? null);
+  // Use direct property access (root is a compat field kept in sync by the store),
+  // never call store methods inside a selector — they re-invoke get() causing
+  // an unstable snapshot that triggers an infinite re-render loop.
+  const root = useLayoutStore((s) => s.root);
   const activePaneId = useLayoutStore((s) => s.activePaneId);
   const sessionTypes = useSessionStore((s) => s.sessionTypes);
 
