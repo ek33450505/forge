@@ -4,6 +4,8 @@ import { useLayoutStore } from '../store/layout';
 export function useKeyboardShortcuts(
   onSplit?: (direction: 'horizontal' | 'vertical') => void,
   onToggleSidebar?: () => void,
+  onToggleInfoPanel?: () => void,
+  onToggleShortcutHints?: () => void,
 ) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -36,6 +38,18 @@ export function useKeyboardShortcuts(
         onToggleSidebar?.();
       }
 
+      // Cmd+I — toggle info panel
+      if (e.metaKey && !e.shiftKey && e.key === 'i') {
+        e.preventDefault();
+        onToggleInfoPanel?.();
+      }
+
+      // Cmd+/ — toggle shortcut hints
+      if (e.metaKey && !e.shiftKey && e.key === '/') {
+        e.preventDefault();
+        onToggleShortcutHints?.();
+      }
+
       // Cmd+1 through Cmd+9 — switch to pane by index
       if (e.metaKey && e.key >= '1' && e.key <= '9') {
         e.preventDefault();
@@ -49,5 +63,5 @@ export function useKeyboardShortcuts(
 
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [onSplit, onToggleSidebar]);
+  }, [onSplit, onToggleSidebar, onToggleInfoPanel, onToggleShortcutHints]);
 }

@@ -2,6 +2,10 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { PaneLayout } from './components/PaneLayout';
 import { SessionSidebar } from './components/SessionSidebar';
+import { StatusBar } from './components/StatusBar';
+import { InfoPanel } from './components/InfoPanel';
+import { ToastNotifications } from './components/ToastNotifications';
+import { ShortcutHints } from './components/ShortcutHints';
 import { useLayoutStore } from './store/layout';
 import { useSessionStore } from './store/sessions';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
@@ -18,6 +22,8 @@ function nextShellName() {
 function App() {
   const [ready, setReady] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [infoPanelOpen, setInfoPanelOpen] = useState(false);
+  const [shortcutHintsVisible, setShortcutHintsVisible] = useState(false);
   const initialized = useRef(false);
 
   const initialize = useLayoutStore((s) => s.initialize);
@@ -103,7 +109,15 @@ function App() {
     setSidebarCollapsed((prev) => !prev);
   }, []);
 
-  useKeyboardShortcuts(handleSplit, handleToggleSidebar);
+  const handleToggleInfoPanel = useCallback(() => {
+    setInfoPanelOpen((prev) => !prev);
+  }, []);
+
+  const handleToggleShortcutHints = useCallback(() => {
+    setShortcutHintsVisible((prev) => !prev);
+  }, []);
+
+  useKeyboardShortcuts(handleSplit, handleToggleSidebar, handleToggleInfoPanel, handleToggleShortcutHints);
   useProcessInspection();
   useClaudeDetection();
   useCastFeed();
@@ -138,7 +152,7 @@ function App() {
         Forge
       </div>
 
-      {/* Main content: sidebar + panes */}
+      {/* Main content: sidebar + panes + info panel */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         <SessionSidebar
           collapsed={sidebarCollapsed}
@@ -147,7 +161,17 @@ function App() {
         <div style={{ flex: 1, overflow: 'hidden' }}>
           {ready && <PaneLayout />}
         </div>
+        <InfoPanel open={infoPanelOpen} onClose={handleToggleInfoPanel} />
       </div>
+
+      {/* Shortcut hints strip — above status bar */}
+      <ShortcutHints visible={shortcutHintsVisible} />
+
+      {/* Status bar — bottom of outer column */}
+      <StatusBar onToggleInfoPanel={handleToggleInfoPanel} />
+
+      {/* Toast portal */}
+      <ToastNotifications />
     </div>
   );
 }

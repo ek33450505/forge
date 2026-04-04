@@ -70,6 +70,10 @@ pub fn pty_create(
             match reader.read(&mut buf) {
                 Ok(0) => {
                     eprintln!("[forge] PTY reader EOF for session {}", sid);
+                    let _ = app_handle.emit(
+                        &format!("session-exit-{}", sid),
+                        serde_json::json!({ "session_id": sid, "reason": "eof" }),
+                    );
                     break;
                 }
                 Ok(n) => {

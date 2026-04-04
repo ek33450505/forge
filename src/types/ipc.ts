@@ -9,3 +9,18 @@ export interface SessionInfo {
   shell: string;
   created_at: number;
 }
+
+export interface GitStatus {
+  branch: string;
+  dirty: boolean;
+}
+
+export interface SessionExitPayload {
+  session_id: string;
+  reason: 'eof' | 'killed';
+}
+
+export interface ForegroundProcess {
+  name: string;
+  pid: number;
+}
