@@ -1,19 +1,28 @@
 import { create } from 'zustand';
 import { invoke } from '@tauri-apps/api/core';
 import type { SessionInfo } from '../types/ipc';
+import type { SessionType, SessionTypeEntry } from '../types/sessions';
 
 interface SessionState {
   sessions: Record<string, SessionInfo>;
+  sessionTypes: Record<string, SessionTypeEntry>;
+  castFeedEnabled: boolean;
 
   addSession: (info: SessionInfo) => void;
   removeSession: (id: string) => void;
   renameSession: (id: string, name: string) => void;
   getSession: (id: string) => SessionInfo | undefined;
   loadSessions: () => Promise<void>;
+
+  setSessionType: (id: string, type: SessionType, manual: boolean) => void;
+  getSessionType: (id: string) => SessionTypeEntry;
+  setCastFeedEnabled: (enabled: boolean) => void;
 }
 
 export const useSessionStore = create<SessionState>()((set, get) => ({
   sessions: {},
+  sessionTypes: {},
+  castFeedEnabled: false,
 
   addSession(info) {
     set((state) => ({
@@ -23,9 +32,11 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
 
   removeSession(id) {
     set((state) => {
-      const next = { ...state.sessions };
-      delete next[id];
-      return { sessions: next };
+      const nextSessions = { ...state.sessions };
+      delete nextSessions[id];
+      const nextSessionTypes = { ...state.sessionTypes };
+      delete nextSessionTypes[id];
+      return { sessions: nextSessions, sessionTypes: nextSessionTypes };
     });
     void invoke('pty_kill', { sessionId: id });
   },
@@ -55,5 +66,25 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
       map[info.id] = info;
     }
     set({ sessions: map });
+  },
+
+  setSessionType(id, type, manual) {
+    const existing = get().sessionTypes[id];
+    // If not manual and existing entry has manualOverride true, skip (manual is sticky)
+    if (!manual && existing?.manualOverride === true) return;
+    set((state) => ({
+      sessionTypes: {
+        ...state.sessionTypes,
+        [id]: { type, manualOverride: manual },
+      },
+    }));
+  },
+
+  getSessionType(id) {
+    return get().sessionTypes[id] ?? { type: 'unknown', manualOverride: false };
+  },
+
+  setCastFeedEnabled(enabled) {
+    set({ castFeedEnabled: enabled });
   },
 }));

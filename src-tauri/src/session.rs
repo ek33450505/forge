@@ -33,6 +33,12 @@ impl SessionStore {
             metadata: Mutex::new(HashMap::new()),
         }
     }
+
+    pub fn get_child_pid(&self, session_id: &str) -> Option<u32> {
+        self.sessions.lock()
+            .get(session_id)
+            .and_then(|s| s.child.process_id())
+    }
 }
 
 #[tauri::command]

@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useLayoutStore } from '../store/layout';
 import { useSessionStore } from '../store/sessions';
 import type { LeafNode } from '../store/layout';
+import { SessionBadge } from './SessionBadge';
+import { SessionTypeMenu } from './SessionTypeMenu';
+import type { SessionType } from '../types/sessions';
 
 function collectLeavesFromRoot(node: import('../store/layout').PaneNode): LeafNode[] {
   if (node.type === 'leaf') return [node];
@@ -13,11 +16,13 @@ interface SidebarItemProps {
   leaf: LeafNode;
   name: string;
   isActive: boolean;
+  sessionType: SessionType;
   onSelect: () => void;
   onRename: (name: string) => void;
+  onContextMenu: (e: React.MouseEvent) => void;
 }
 
-function SidebarItem({ index, leaf: _leaf, name, isActive, onSelect, onRename }: SidebarItemProps) {
+function SidebarItem({ index, leaf: _leaf, name, isActive, sessionType, onSelect, onRename, onContextMenu }: SidebarItemProps) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(name);
 
@@ -29,6 +34,8 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, onSelect, onRename }:
     setEditing(false);
   }
 
+  const isClaude = sessionType === 'claude';
+
   return (
     <div
       onMouseDown={onSelect}
@@ -37,14 +44,23 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, onSelect, onRename }:
         setDraft(name);
         setEditing(true);
       }}
+      onContextMenu={onContextMenu}
       style={{
         display: 'flex',
         alignItems: 'center',
         gap: '8px',
         padding: '6px 10px',
         cursor: 'pointer',
-        borderLeft: isActive ? '2px solid #e0e0e0' : '2px solid transparent',
-        backgroundColor: isActive ? '#1e2a4a' : 'transparent',
+        borderLeft: isClaude
+          ? '2px solid #c084fc'
+          : isActive
+          ? '2px solid #e0e0e0'
+          : '2px solid transparent',
+        backgroundColor: isClaude
+          ? '#1a0f2e'
+          : isActive
+          ? '#1e2a4a'
+          : 'transparent',
         userSelect: 'none',
       }}
     >
@@ -81,18 +97,21 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, onSelect, onRename }:
           }}
         />
       ) : (
-        <span
-          style={{
-            flex: 1,
-            fontSize: '12px',
-            color: isActive ? '#e0e0e0' : '#a0a8c0',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {name}
-        </span>
+        <>
+          <span
+            style={{
+              flex: 1,
+              fontSize: '12px',
+              color: isActive ? '#e0e0e0' : '#a0a8c0',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {name}
+          </span>
+          <SessionBadge type={sessionType} size="sm" />
+        </>
       )}
     </div>
   );
@@ -103,12 +122,22 @@ interface SessionSidebarProps {
   onToggle: () => void;
 }
 
+interface ContextMenuState {
+  sessionId: string;
+  x: number;
+  y: number;
+}
+
 export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
   const root = useLayoutStore((s) => s.root);
   const activePaneId = useLayoutStore((s) => s.activePaneId);
   const setActivePane = useLayoutStore((s) => s.setActivePane);
   const sessions = useSessionStore((s) => s.sessions);
   const renameSession = useSessionStore((s) => s.renameSession);
+  const getSessionType = useSessionStore((s) => s.getSessionType);
+  const setSessionType = useSessionStore((s) => s.setSessionType);
+
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
   const leaves = root ? collectLeavesFromRoot(root) : [];
 
@@ -186,6 +215,7 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
             {leaves.map((leaf, index) => {
               const session = sessions[leaf.sessionId];
               const name = session?.name ?? `Shell ${index + 1}`;
+              const { type: sessionType } = getSessionType(leaf.sessionId);
               return (
                 <SidebarItem
                   key={leaf.id}
@@ -193,13 +223,28 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
                   leaf={leaf}
                   name={name}
                   isActive={activePaneId === leaf.id}
+                  sessionType={sessionType}
                   onSelect={() => { setActivePane(leaf.id); }}
                   onRename={(newName) => { renameSession(leaf.sessionId, newName); }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    setContextMenu({ sessionId: leaf.sessionId, x: e.clientX, y: e.clientY });
+                  }}
                 />
               );
             })}
           </div>
         </>
+      )}
+      {contextMenu && (
+        <SessionTypeMenu
+          sessionId={contextMenu.sessionId}
+          currentType={getSessionType(contextMenu.sessionId).type}
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onSelect={(id, type) => { setSessionType(id, type, true); }}
+          onClose={() => { setContextMenu(null); }}
+        />
       )}
     </div>
   );

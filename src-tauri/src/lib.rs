@@ -1,4 +1,5 @@
 mod config;
+mod process;
 mod pty;
 mod session;
 
@@ -28,6 +29,7 @@ pub fn run() {
             session::session_list,
             session::session_rename,
             session::session_create_metadata,
+            process::get_foreground_process,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

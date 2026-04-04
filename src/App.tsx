@@ -5,6 +5,9 @@ import { SessionSidebar } from './components/SessionSidebar';
 import { useLayoutStore } from './store/layout';
 import { useSessionStore } from './store/sessions';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useProcessInspection } from './hooks/useProcessInspection';
+import { useClaudeDetection } from './hooks/useClaudeDetection';
+import { useCastFeed } from './hooks/useCastFeed';
 
 let shellCounter = 0;
 function nextShellName() {
@@ -101,6 +104,9 @@ function App() {
   }, []);
 
   useKeyboardShortcuts(handleSplit, handleToggleSidebar);
+  useProcessInspection();
+  useClaudeDetection();
+  useCastFeed();
 
   return (
     <div
