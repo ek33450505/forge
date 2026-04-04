@@ -19,20 +19,25 @@ function App() {
   // Create first PTY session on mount
   useEffect(() => {
     void (async () => {
-      const sessionId = await invoke<string>('pty_create', {
-        shell: '/bin/zsh',
-        cols: 80,
-        rows: 24,
-      });
-      addSession({
-        id: sessionId,
-        name: 'Shell 1',
-        shell: '/bin/zsh',
-        created_at: Date.now() / 1000,
-      });
-      const paneId = crypto.randomUUID();
-      initialize(paneId, sessionId);
-      setReady(true);
+      try {
+        const sessionId = await invoke<string>('pty_create', {
+          shell: '/bin/zsh',
+          cols: 80,
+          rows: 24,
+        });
+        addSession({
+          id: sessionId,
+          name: 'Shell 1',
+          shell: '/bin/zsh',
+          created_at: Date.now() / 1000,
+        });
+        const paneId = crypto.randomUUID();
+        initialize(paneId, sessionId);
+        setReady(true);
+      } catch (err) {
+        console.error('Failed to create initial PTY session:', err);
+        setReady(true); // Render UI anyway so user sees something
+      }
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

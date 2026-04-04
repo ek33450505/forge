@@ -7,7 +7,7 @@ import { listen } from '@tauri-apps/api/event';
 import type { PtyOutputPayload } from '../types/ipc';
 
 export function useTerminal(
-  containerRef: React.RefObject<HTMLDivElement>,
+  containerRef: React.RefObject<HTMLDivElement | null>,
   sessionId: string,
 ): void {
   useEffect(() => {

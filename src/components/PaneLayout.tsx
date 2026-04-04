@@ -1,4 +1,4 @@
-import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
+import { Group, Panel, Separator } from 'react-resizable-panels';
 import type { PaneNode, LeafNode, BranchNode } from '../store/layout';
 import { useLayoutStore } from '../store/layout';
 import { TerminalPane } from './TerminalPane';
@@ -25,26 +25,26 @@ interface PaneBranchProps {
 }
 
 function PaneBranch({ node }: PaneBranchProps) {
-  const direction = node.direction === 'horizontal' ? 'horizontal' : 'vertical';
+  const orientation = node.direction === 'horizontal' ? 'horizontal' : 'vertical';
 
   return (
-    <PanelGroup direction={direction} style={{ width: '100%', height: '100%' }}>
+    <Group orientation={orientation} style={{ width: '100%', height: '100%' }}>
       <Panel defaultSize={node.ratio * 100}>
         <PaneTree node={node.children[0]} />
       </Panel>
-      <PanelResizeHandle
+      <Separator
         style={{
-          width: direction === 'horizontal' ? '4px' : undefined,
-          height: direction === 'vertical' ? '4px' : undefined,
+          width: orientation === 'horizontal' ? '4px' : undefined,
+          height: orientation === 'vertical' ? '4px' : undefined,
           backgroundColor: '#2a2a3e',
-          cursor: direction === 'horizontal' ? 'col-resize' : 'row-resize',
+          cursor: orientation === 'horizontal' ? 'col-resize' : 'row-resize',
           flexShrink: 0,
         }}
       />
       <Panel defaultSize={(1 - node.ratio) * 100}>
         <PaneTree node={node.children[1]} />
       </Panel>
-    </PanelGroup>
+    </Group>
   );
 }
 
