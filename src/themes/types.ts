@@ -1,0 +1,45 @@
+export interface ForgeTheme {
+  name: string;
+  displayName: string;
+  background: string;
+  foreground: string;
+  accent: string;
+  accentSoft: string;
+  sidebar: string;
+  sidebarBorder: string;
+  titleBar: string;
+  titleBarText: string;
+  paneHeader: string;
+  paneHeaderActive: string;
+  paneHeaderText: string;
+  statusBar: string;
+  statusBarText: string;
+  border: string;
+  inputBackground: string;
+  inputText: string;
+  modalBackground: string;
+  modalOverlay: string;
+  terminal: {
+    background: string;
+    foreground: string;
+    cursor: string;
+    cursorAccent?: string;
+    selectionBackground?: string;
+    black: string;
+    red: string;
+    green: string;
+    yellow: string;
+    blue: string;
+    magenta: string;
+    cyan: string;
+    white: string;
+    brightBlack: string;
+    brightRed: string;
+    brightGreen: string;
+    brightYellow: string;
+    brightBlue: string;
+    brightMagenta: string;
+    brightCyan: string;
+    brightWhite: string;
+  };
+}

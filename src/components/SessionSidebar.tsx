@@ -147,11 +147,11 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
       style={{
         width: collapsed ? '20px' : '180px',
         minWidth: collapsed ? '20px' : '180px',
-        backgroundColor: '#16213e',
+        backgroundColor: 'var(--sidebar-bg)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        borderRight: '1px solid #2a2a3e',
+        borderRight: '1px solid var(--sidebar-border)',
         transition: 'width 150ms ease, min-width 150ms ease',
         flexShrink: 0,
       }}
@@ -181,7 +181,7 @@ export function SessionSidebar({ collapsed, onToggle }: SessionSidebarProps) {
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '6px 10px',
-              borderBottom: '1px solid #2a2a3e',
+              borderBottom: '1px solid var(--sidebar-border)',
               flexShrink: 0,
             }}
           >

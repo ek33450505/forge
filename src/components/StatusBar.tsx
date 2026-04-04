@@ -21,15 +21,15 @@ export function StatusBar({ onToggleInfoPanel }: StatusBarProps) {
       style={{
         height: '24px',
         flexShrink: 0,
-        backgroundColor: '#0f1923',
-        borderTop: '1px solid #2a2a3e',
+        backgroundColor: 'var(--status-bar-bg)',
+        borderTop: '1px solid var(--border)',
         display: 'flex',
         alignItems: 'center',
         paddingLeft: '12px',
         paddingRight: '12px',
         gap: '16px',
         fontSize: '11px',
-        color: '#8888aa',
+        color: 'var(--status-bar-text)',
         userSelect: 'none',
         fontFamily: 'monospace',
       }}
@@ -56,7 +56,7 @@ export function StatusBar({ onToggleInfoPanel }: StatusBarProps) {
         style={{
           background: 'none',
           border: 'none',
-          color: '#8888aa',
+          color: 'var(--status-bar-text)',
           cursor: 'pointer',
           fontSize: '11px',
           padding: '0 4px',

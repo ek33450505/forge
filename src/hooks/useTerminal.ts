@@ -1,29 +1,39 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import type { PtyOutputPayload } from '../types/ipc';
+import { useThemeStore, resolveTheme } from '../store/theme';
 
 export function useTerminal(
   containerRef: React.RefObject<HTMLDivElement | null>,
   sessionId: string,
 ): void {
+  // Lift terminal ref so we can update options without remounting
+  const terminalRef = useRef<Terminal | null>(null);
+
+  // Select primitives only — never select the whole theme object
+  const themeName = useThemeStore((s) => s.themeName);
+  const fontFamily = useThemeStore((s) => s.fontFamily);
+  const fontSize = useThemeStore((s) => s.fontSize);
+
+  // Mount effect — creates terminal once per sessionId
   useEffect(() => {
     if (!containerRef.current) return;
 
+    const theme = resolveTheme(themeName);
+
     const terminal = new Terminal({
-      fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-      fontSize: 14,
-      theme: {
-        background: '#1a1a2e',
-        foreground: '#e0e0e0',
-        cursor: '#e0e0e0',
-      },
+      fontFamily,
+      fontSize,
+      theme: theme.terminal,
       cursorBlink: true,
       cursorStyle: 'block',
     });
+
+    terminalRef.current = terminal;
 
     const fitAddon = new FitAddon();
     const webLinksAddon = new WebLinksAddon();
@@ -85,6 +95,7 @@ export function useTerminal(
 
     return () => {
       isMounted = false;
+      terminalRef.current = null;
 
       if (unlistenFn) {
         unlistenFn();
@@ -94,5 +105,18 @@ export function useTerminal(
       terminal.dispose();
       resizeObserver?.disconnect();
     };
+    // Only re-mount when containerRef or sessionId changes — NOT on theme/font changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [containerRef, sessionId]);
+
+  // Live theme/font update effect — updates options without remounting
+  useEffect(() => {
+    const terminal = terminalRef.current;
+    if (!terminal) return;
+
+    const theme = resolveTheme(themeName);
+    terminal.options.fontFamily = fontFamily;
+    terminal.options.fontSize = fontSize;
+    terminal.options.theme = theme.terminal;
+  }, [themeName, fontFamily, fontSize]);
 }

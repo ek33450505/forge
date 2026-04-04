@@ -30,14 +30,14 @@ interface Props {
 }
 
 const THEME = {
-  backdrop: 'rgba(0,0,0,0.6)',
-  bg: '#1a1a2e',
-  bgHover: '#0f3460',
-  text: '#e0e0e0',
-  textMuted: '#6b7280',
-  border: '#2a2a4e',
-  inputBg: '#12122a',
-  groupHeading: '#888aaa',
+  backdrop: 'var(--modal-overlay)',
+  bg: 'var(--modal-bg)',
+  bgHover: 'var(--accent-soft)',
+  text: 'var(--fg)',
+  textMuted: 'var(--status-bar-text)',
+  border: 'var(--border)',
+  inputBg: 'var(--input-bg)',
+  groupHeading: 'var(--status-bar-text)',
 };
 
 export function CommandPalette({ open, onClose, onExecute }: Props) {

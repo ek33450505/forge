@@ -8,6 +8,8 @@ import { InfoPanel } from './components/InfoPanel';
 import { ToastNotifications } from './components/ToastNotifications';
 import { ShortcutHints } from './components/ShortcutHints';
 import { CommandPalette } from './components/CommandPalette';
+import { Flame } from './components/Flame';
+import { SettingsPanel } from './components/SettingsPanel';
 import { useLayoutStore } from './store/layout';
 import { useSessionStore } from './store/sessions';
 import { useCommandHistoryStore } from './store/commandHistory';
@@ -16,6 +18,9 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useProcessInspection } from './hooks/useProcessInspection';
 import { useClaudeDetection } from './hooks/useClaudeDetection';
 import { useCastFeed } from './hooks/useCastFeed';
+import { useTheme } from './hooks/useTheme';
+import { loadForgeConfig } from './hooks/useForgeConfig';
+import { useThemeStore } from './store/theme';
 
 let shellCounter = 0;
 function nextShellName() {
@@ -24,11 +29,15 @@ function nextShellName() {
 }
 
 function App() {
+  // Apply CSS custom properties for the active theme
+  useTheme();
+
   const [ready, setReady] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [infoPanelOpen, setInfoPanelOpen] = useState(false);
   const [shortcutHintsVisible, setShortcutHintsVisible] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [settingsPanelOpen, setSettingsPanelOpen] = useState(false);
   const initialized = useRef(false);
 
   const initialize = useLayoutStore((s) => s.initialize);
@@ -44,6 +53,12 @@ function App() {
 
     void (async () => {
       try {
+        // Load persisted config and hydrate theme store before creating the terminal
+        const cfg = await loadForgeConfig();
+        if (cfg.theme) useThemeStore.getState().setTheme(cfg.theme);
+        if (cfg.fontFamily) useThemeStore.getState().setFontFamily(cfg.fontFamily);
+        if (cfg.fontSize) useThemeStore.getState().setFontSize(cfg.fontSize);
+
         const sessionId = await invoke<string>('pty_create', {
           shell: '/bin/zsh',
           cols: 80,
@@ -130,6 +145,10 @@ function App() {
     setCommandPaletteOpen(false);
   }, []);
 
+  const handleToggleSettings = useCallback(() => {
+    setSettingsPanelOpen((prev) => !prev);
+  }, []);
+
   // Register built-in commands — use overwriteCommand for StrictMode idempotency
   useEffect(() => {
     overwriteCommand({
@@ -158,7 +177,7 @@ function App() {
       group: 'Layout',
       keybind: '⌘W',
       handler: () => {
-        useLayoutStore.getState().closePane(activePaneId ?? '');
+        useLayoutStore.getState().closePane(useLayoutStore.getState().activePaneId ?? '');
       },
     });
     overwriteCommand({
@@ -166,10 +185,11 @@ function App() {
       label: 'Rename Session',
       group: 'Session',
       handler: () => {
+        const currentActivePaneId = useLayoutStore.getState().activePaneId;
         const activeSessionId = useLayoutStore
           .getState()
           .getLeaves()
-          .find((l) => l.id === activePaneId)?.sessionId;
+          .find((l) => l.id === currentActivePaneId)?.sessionId;
         if (!activeSessionId) return;
         const name = window.prompt('Rename session:');
         if (name) {
@@ -181,16 +201,16 @@ function App() {
       id: 'switch-theme',
       label: 'Switch Theme',
       group: 'Settings',
-      handler: () => { toast.info('Themes coming in Phase 6'); },
+      handler: () => { setSettingsPanelOpen(true); },
     });
     overwriteCommand({
       id: 'open-settings',
       label: 'Open Settings',
       group: 'Settings',
       keybind: '⌘,',
-      handler: () => { toast.info('Settings coming in Phase 6'); },
+      handler: () => { setSettingsPanelOpen(true); },
     });
-  }, [activePaneId, handleSplit]);
+  }, [handleSplit]);
 
   const handleExecuteCommand = useCallback(
     (cmd: ForgeCommand | { id: string; label: string; group: 'Session'; sessionId: string }) => {
@@ -203,7 +223,7 @@ function App() {
     [],
   );
 
-  useKeyboardShortcuts(handleSplit, handleToggleSidebar, handleToggleInfoPanel, handleToggleShortcutHints, handleToggleCommandPalette);
+  useKeyboardShortcuts(handleSplit, handleToggleSidebar, handleToggleInfoPanel, handleToggleShortcutHints, handleToggleCommandPalette, handleToggleSettings);
   useProcessInspection();
   useClaudeDetection();
   useCastFeed();
@@ -213,8 +233,8 @@ function App() {
       style={{
         width: '100vw',
         height: '100vh',
-        backgroundColor: '#1a1a2e',
-        color: '#e0e0e0',
+        backgroundColor: 'var(--bg)',
+        color: 'var(--fg)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -225,17 +245,18 @@ function App() {
         style={{
           height: '28px',
           flexShrink: 0,
-          backgroundColor: '#16213e',
+          backgroundColor: 'var(--title-bar-bg)',
           display: 'flex',
           alignItems: 'center',
           paddingLeft: '12px',
           fontSize: '13px',
           fontWeight: 600,
-          color: '#a0a0b0',
+          color: 'var(--title-bar-text)',
           userSelect: 'none',
         }}
       >
-        Forge
+        <Flame />
+        <span>Forge</span>
       </div>
 
       {/* Main content: sidebar + panes + info panel */}
@@ -261,6 +282,12 @@ function App() {
         open={commandPaletteOpen}
         onClose={handleCloseCommandPalette}
         onExecute={handleExecuteCommand}
+      />
+
+      {/* Settings panel overlay */}
+      <SettingsPanel
+        open={settingsPanelOpen}
+        onClose={() => setSettingsPanelOpen(false)}
       />
 
       {/* Toast portal */}

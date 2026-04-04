@@ -22,17 +22,17 @@ export function PaneHeader({ sessionId, isActive }: PaneHeaderProps) {
         gap: '6px',
         paddingLeft: '10px',
         paddingRight: '8px',
-        backgroundColor: isClaude ? '#1a0f2e' : '#13192b',
-        borderBottom: '1px solid #2a2a3e',
+        backgroundColor: isActive ? 'var(--pane-header-active-bg)' : 'var(--pane-header-bg)',
+        borderBottom: '1px solid var(--border)',
         borderLeft: isClaude
           ? '2px solid #c084fc'
           : isActive
-          ? '2px solid #4060e0'
+          ? '2px solid var(--accent)'
           : '2px solid transparent',
         flexShrink: 0,
         userSelect: 'none',
         fontSize: '12px',
-        color: isActive ? '#e0e0e0' : '#6070a0',
+        color: 'var(--pane-header-text)',
       }}
     >
       <span

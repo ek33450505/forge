@@ -42,12 +42,12 @@ export function InfoPanel({ open, onClose }: InfoPanelProps) {
         flexShrink: 0,
         overflow: 'hidden',
         transition: 'width 200ms ease',
-        backgroundColor: '#12192a',
-        borderLeft: open ? '1px solid #2a2a3e' : 'none',
+        backgroundColor: 'var(--modal-bg)',
+        borderLeft: open ? '1px solid var(--border)' : 'none',
         display: 'flex',
         flexDirection: 'column',
         fontSize: '12px',
-        color: '#c0c0d0',
+        color: 'var(--fg)',
         fontFamily: 'monospace',
       }}
     >
@@ -57,7 +57,7 @@ export function InfoPanel({ open, onClose }: InfoPanelProps) {
             <span style={{ fontWeight: 600, fontSize: '13px' }}>Session Info</span>
             <button
               onClick={onClose}
-              style={{ background: 'none', border: 'none', color: '#8888aa', cursor: 'pointer', fontSize: '16px' }}
+              style={{ background: 'none', border: 'none', color: 'var(--status-bar-text)', cursor: 'pointer', fontSize: '16px' }}
             >
               ×
             </button>

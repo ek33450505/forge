@@ -7,6 +7,7 @@ export function useKeyboardShortcuts(
   onToggleInfoPanel?: () => void,
   onToggleShortcutHints?: () => void,
   onToggleCommandPalette?: () => void,
+  onToggleSettings?: () => void,
 ) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -57,6 +58,12 @@ export function useKeyboardShortcuts(
         onToggleShortcutHints?.();
       }
 
+      // Cmd+, — open settings
+      if (e.metaKey && !e.shiftKey && e.key === ',') {
+        e.preventDefault();
+        onToggleSettings?.();
+      }
+
       // Cmd+1 through Cmd+9 — switch to pane by index
       if (e.metaKey && e.key >= '1' && e.key <= '9') {
         e.preventDefault();
@@ -70,5 +77,5 @@ export function useKeyboardShortcuts(
 
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [onSplit, onToggleSidebar, onToggleInfoPanel, onToggleShortcutHints, onToggleCommandPalette]);
+  }, [onSplit, onToggleSidebar, onToggleInfoPanel, onToggleShortcutHints, onToggleCommandPalette, onToggleSettings]);
 }
