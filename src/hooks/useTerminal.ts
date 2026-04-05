@@ -68,20 +68,20 @@ export function useTerminal(
             if (!isMounted) return;
 
             if (data === '\r' || data === '\n') {
-              // Enter pressed — check for slash command
+              // Enter pressed — check for slash command (only known Forge commands)
               if (lineBuffer.startsWith('/')) {
                 const parts = lineBuffer.slice(1).split(/\s+/);
                 const cmdName = parts[0];
-                const args = parts.slice(1);
                 const cmd = cmdName ? getTerminalCommand(cmdName) : undefined;
-                terminal.write('\r\n');
                 if (cmd) {
+                  // Known Forge command — handle locally, don't send to PTY
+                  const args = parts.slice(1);
+                  terminal.write('\r\n');
                   cmd.handler(terminal, args);
-                } else {
-                  terminal.writeln(`Unknown command: /${cmdName ?? ''}. Type /help for available commands.`);
+                  lineBuffer = '';
+                  return;
                 }
-                lineBuffer = '';
-                return; // Do NOT send to PTY
+                // Unknown /command — pass through to PTY (could be Claude Code, etc.)
               }
               lineBuffer = '';
               void invoke('pty_write', { sessionId, data });
