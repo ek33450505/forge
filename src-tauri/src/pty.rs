@@ -34,7 +34,9 @@ pub fn pty_create(
         })
         .map_err(|e| e.to_string())?;
 
-    let cmd = CommandBuilder::new(&shell);
+    let mut cmd = CommandBuilder::new(&shell);
+    cmd.env("TERM", "xterm-256color");
+    cmd.env("COLORTERM", "truecolor");
 
     let child = pair
         .slave

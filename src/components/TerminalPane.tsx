@@ -3,7 +3,6 @@ import '@xterm/xterm/css/xterm.css';
 import { useTerminal } from '../hooks/useTerminal';
 import { useSessionStore } from '../store/sessions';
 import { TerminalSearch } from './TerminalSearch';
-import { GhostTextOverlay } from './GhostTextOverlay';
 import { ErrorAnnotation } from './ErrorAnnotation';
 import { PaneHeader } from './PaneHeader';
 import { ErrorBoundary } from './ErrorBoundary';
@@ -50,7 +49,6 @@ export function TerminalPane({ paneId, sessionId, isActive, onFocus }: TerminalP
             style={{ width: '100%', height: '100%' }}
           />
           <TerminalSearch sessionId={sessionId} />
-          <GhostTextOverlay sessionId={sessionId} />
           <ErrorAnnotation sessionId={sessionId} />
         </div>
       </ErrorBoundary>
