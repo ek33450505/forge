@@ -50,9 +50,11 @@ OUTPUT=$(pwd)
 # ─────────────────────────────────────────────
 header "Terminal Capabilities"
 
-# columns and lines
-[[ -n "$COLUMNS" && "$COLUMNS" -gt 0 ]] 2>/dev/null && pass "COLUMNS is set ($COLUMNS)" || fail "COLUMNS is not set or zero"
-[[ -n "$LINES" && "$LINES" -gt 0 ]] 2>/dev/null && pass "LINES is set ($LINES)" || fail "LINES is not set or zero"
+# columns and lines (use tput — $COLUMNS/$LINES are only set in interactive shells)
+COLS=$(tput cols 2>/dev/null)
+ROWS=$(tput lines 2>/dev/null)
+[[ -n "$COLS" && "$COLS" -gt 0 ]] && pass "terminal columns = $COLS" || fail "terminal columns not available"
+[[ -n "$ROWS" && "$ROWS" -gt 0 ]] && pass "terminal lines = $ROWS" || fail "terminal lines not available"
 
 # TERM value
 [[ "$TERM" == *"256color"* || "$TERM" == "xterm" || "$TERM" == "screen" ]] && pass "TERM supports color ($TERM)" || fail "TERM may not support color ($TERM)"
@@ -128,17 +130,13 @@ sleep 1
 pass "error pattern triggers executed (verify annotations visually)"
 
 # ─────────────────────────────────────────────
-header "Ghost Text Seeding"
-echo "  Running commands to seed history for ghost text testing..."
-
-git status 2>/dev/null || true
-git log --oneline -5 2>/dev/null || true
-npm run test 2>/dev/null || true
-echo 'forge test complete'
-
-echo ""
-printf '\033[33m  >>> Now type "git s" — ghost text should suggest "git status"\033[0m\n'
-printf '\033[33m  >>> Now type "git l" — ghost text should suggest "git log --oneline -5"\033[0m\n'
+header "Slash Commands"
+echo "  Testing /help command..."
+printf '\033[33m  >>> After this script, try these in the terminal:\033[0m\n'
+printf '\033[33m  >>> /help     — list available commands\033[0m\n'
+printf '\033[33m  >>> /clear    — clear scrollback\033[0m\n'
+printf '\033[33m  >>> /theme forge-light — switch theme\033[0m\n'
+printf '\033[33m  >>> /theme forge-dark  — switch back\033[0m\n'
 
 # ─────────────────────────────────────────────
 header "Long Command (Completion Notification)"
