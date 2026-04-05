@@ -93,7 +93,11 @@ export function useTerminal(
               lineBuffer = '';
               void invoke('pty_write', { sessionId, data });
             } else {
-              if (data.length === 1 && data >= ' ') {
+              // Only track single printable characters for slash command detection
+              // Reset buffer on escape sequences (TUI apps like Claude Code)
+              if (data.includes('\x1b') || data.length > 1) {
+                lineBuffer = '';
+              } else if (data >= ' ') {
                 lineBuffer += data;
               }
               void invoke('pty_write', { sessionId, data });

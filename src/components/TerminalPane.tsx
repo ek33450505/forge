@@ -4,7 +4,6 @@ import { useTerminal } from '../hooks/useTerminal';
 import { useSessionStore } from '../store/sessions';
 import { TerminalSearch } from './TerminalSearch';
 import { ErrorAnnotation } from './ErrorAnnotation';
-import { PaneHeader } from './PaneHeader';
 import { ErrorBoundary } from './ErrorBoundary';
 import { useErrorDetection } from '../hooks/useErrorDetection';
 import { useCompletionNotifier } from '../hooks/useCompletionNotifier';
@@ -42,7 +41,6 @@ export function TerminalPane({ paneId, sessionId, isActive, onFocus }: TerminalP
       }}
     >
       <ErrorBoundary paneId={paneId}>
-        <PaneHeader sessionId={sessionId} paneId={paneId} isActive={isActive} />
         <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
           <div
             ref={containerRef}
