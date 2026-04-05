@@ -44,7 +44,8 @@ export function TabBar({ onNewTab, onCloseTab }: TabBarProps) {
         const sessionType = primarySessionId
           ? (sessionTypes[primarySessionId]?.type ?? 'unknown')
           : 'unknown';
-        const isClaude = sessionType === 'claude';
+        const AI_TYPES = ['claude-code', 'aider', 'ollama', 'codex', 'open-interpreter', 'cursor-cli'] as const;
+        const isClaude = AI_TYPES.includes(sessionType as typeof AI_TYPES[number]);
 
         return (
           <div

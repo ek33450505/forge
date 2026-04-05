@@ -6,10 +6,14 @@ interface SessionBadgeProps {
 }
 
 const BADGE_CONFIG: Record<SessionType, { label: string; bg: string; color: string }> = {
-  claude: { label: 'Claude', bg: 'var(--claude-accent-bg)',  color: 'var(--claude-accent)' },
-  cast:   { label: 'CAST',   bg: 'var(--cast-accent-bg, var(--claude-accent-bg))',  color: 'var(--cast-accent, var(--claude-accent))' },
-  shell:  { label: 'Shell',  bg: 'var(--card-bg)',  color: 'var(--accent)' },
-  unknown: { label: '',      bg: 'transparent', color: 'transparent' },
+  'claude-code':       { label: 'Claude Code',    bg: 'var(--claude-accent-bg)', color: 'var(--claude-accent)' },
+  'aider':             { label: 'Aider',           bg: 'var(--claude-accent-bg)', color: 'var(--claude-accent)' },
+  'ollama':            { label: 'Ollama',          bg: 'var(--claude-accent-bg)', color: 'var(--claude-accent)' },
+  'codex':             { label: 'Codex',           bg: 'var(--claude-accent-bg)', color: 'var(--claude-accent)' },
+  'open-interpreter':  { label: 'Interpreter',    bg: 'var(--claude-accent-bg)', color: 'var(--claude-accent)' },
+  'cursor-cli':        { label: 'Cursor',          bg: 'var(--claude-accent-bg)', color: 'var(--claude-accent)' },
+  'shell':             { label: 'Shell',           bg: 'var(--card-bg)',          color: 'var(--accent)' },
+  'unknown':           { label: '',               bg: 'transparent',             color: 'transparent' },
 };
 
 export function SessionBadge({ type, size = 'sm' }: SessionBadgeProps) {

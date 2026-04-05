@@ -14,9 +14,14 @@ interface SessionTypeMenuProps {
 }
 
 const MENU_OPTIONS: { type: SessionType; label: string }[] = [
-  { type: 'shell',   label: 'Shell session'    },
-  { type: 'claude',  label: 'Claude session'   },
-  { type: 'unknown', label: 'Unknown'          },
+  { type: 'shell',             label: 'Shell session'         },
+  { type: 'claude-code',       label: 'Claude Code'           },
+  { type: 'aider',             label: 'Aider'                 },
+  { type: 'ollama',            label: 'Ollama'                },
+  { type: 'codex',             label: 'OpenAI Codex CLI'      },
+  { type: 'open-interpreter',  label: 'Open Interpreter'      },
+  { type: 'cursor-cli',        label: 'Cursor CLI'            },
+  { type: 'unknown',           label: 'Unknown'               },
 ];
 
 export function SessionTypeMenu({

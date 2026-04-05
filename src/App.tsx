@@ -15,7 +15,7 @@ import { useTerminalSearchStore } from './store/terminalSearch';
 import { overwriteCommand, type Command as ForgeCommand } from './lib/commands';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useProcessInspection } from './hooks/useProcessInspection';
-import { useClaudeDetection } from './hooks/useClaudeDetection';
+import { useAIDetection } from './hooks/useAIDetection';
 import { TabBar } from './components/TabBar';
 import { useTheme } from './hooks/useTheme';
 import { loadForgeConfig } from './hooks/useForgeConfig';
@@ -267,7 +267,7 @@ function App() {
 
   useKeyboardShortcuts(handleNewTab, handleSplit, handleToggleSidebar, handleToggleInfoPanel, handleToggleShortcutRef, handleToggleCommandPalette, handleToggleSettings);
   useProcessInspection();
-  useClaudeDetection();
+  useAIDetection();
 
   return (
     <div

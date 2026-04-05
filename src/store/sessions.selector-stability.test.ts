@@ -23,7 +23,6 @@ beforeEach(() => {
   useSessionStore.setState({
     sessions: {},
     sessionTypes: {},
-    castFeedEnabled: false,
   });
 });
 
@@ -63,9 +62,9 @@ describe('sessions store — selector stability', () => {
     expect(state.sessionTypes[sessionId]?.type ?? 'unknown').toBe('unknown');
 
     // After setSessionType: returns the new type
-    setSessionType(sessionId, 'claude', false);
+    setSessionType(sessionId, 'claude-code', false);
     state = useSessionStore.getState();
-    expect(state.sessionTypes[sessionId]?.type ?? 'unknown').toBe('claude');
+    expect(state.sessionTypes[sessionId]?.type ?? 'unknown').toBe('claude-code');
   });
 
   it('direct state access sessionTypes[id]?.type returns stable string after repeated identical setSessionType calls', () => {
@@ -90,12 +89,12 @@ describe('sessions store — selector stability', () => {
     const sessionId = 'sticky-session';
 
     // Manual override sets and locks the type
-    setSessionType(sessionId, 'claude', true);
-    expect(useSessionStore.getState().sessionTypes[sessionId]?.type).toBe('claude');
+    setSessionType(sessionId, 'claude-code', true);
+    expect(useSessionStore.getState().sessionTypes[sessionId]?.type).toBe('claude-code');
 
     // Non-manual call should NOT overwrite a manual override
     setSessionType(sessionId, 'shell', false);
-    expect(useSessionStore.getState().sessionTypes[sessionId]?.type).toBe('claude');
+    expect(useSessionStore.getState().sessionTypes[sessionId]?.type).toBe('claude-code');
 
     // Manual call CAN overwrite a manual override
     setSessionType(sessionId, 'shell', true);

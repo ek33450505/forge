@@ -14,7 +14,8 @@ export function PaneHeader({ sessionId, paneId, isActive }: PaneHeaderProps) {
   const notifyEnabled = useNotificationSettingsStore((s) => s.paneNotifyEnabled[paneId] ?? false);
   const toggleNotify = useNotificationSettingsStore((s) => s.togglePane);
 
-  const isClaude = type === 'claude';
+  const AI_TYPES = ['claude-code', 'aider', 'ollama', 'codex', 'open-interpreter', 'cursor-cli'] as const;
+  const isClaude = AI_TYPES.includes(type as typeof AI_TYPES[number]);
   const name = session?.name ?? 'Shell';
 
   return (

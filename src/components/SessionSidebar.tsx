@@ -34,7 +34,8 @@ function SidebarItem({ index, leaf: _leaf, name, isActive, sessionType, onSelect
     setEditing(false);
   }
 
-  const isClaude = sessionType === 'claude';
+  const AI_TYPES = ['claude-code', 'aider', 'ollama', 'codex', 'open-interpreter', 'cursor-cli'] as const;
+  const isClaude = AI_TYPES.includes(sessionType as typeof AI_TYPES[number]);
 
   return (
     <div

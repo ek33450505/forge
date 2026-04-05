@@ -17,9 +17,10 @@ export function useAgentOutput(): void {
     let cancelled = false;
     const unlisteners: Array<() => void> = [];
 
-    // Find all Claude sessions
+    // Find all AI tool sessions (not shell or unknown)
+    const AI_TYPES = ['claude-code', 'aider', 'ollama', 'codex', 'open-interpreter', 'cursor-cli'] as const;
     const claudeSessionIds = Object.entries(sessionTypes)
-      .filter(([, entry]) => entry.type === 'claude')
+      .filter(([, entry]) => AI_TYPES.includes(entry.type as typeof AI_TYPES[number]))
       .map(([id]) => id);
 
     // Use an async IIFE so we can await all listen() calls before returning.

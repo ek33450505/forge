@@ -22,7 +22,8 @@ export function TerminalPane({ paneId, sessionId, isActive, onFocus }: TerminalP
   useCompletionNotifier(sessionId, paneId);
 
   const type = useSessionStore((s) => s.sessionTypes[sessionId]?.type ?? 'unknown');
-  const isClaude = type === 'claude';
+  const AI_TYPES = ['claude-code', 'aider', 'ollama', 'codex', 'open-interpreter', 'cursor-cli'] as const;
+  const isClaude = AI_TYPES.includes(type as typeof AI_TYPES[number]);
 
   return (
     <div

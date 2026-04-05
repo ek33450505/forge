@@ -27,7 +27,7 @@ export function useProcessInspection() {
             );
             setSessionType(
               sessionId,
-              isClaudeProcess ? 'claude' : 'shell',
+              isClaudeProcess ? 'claude-code' : 'shell',
               false
             );
           })

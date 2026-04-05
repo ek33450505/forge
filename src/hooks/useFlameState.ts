@@ -1,18 +1,17 @@
 import { useSessionStore } from '../store/sessions';
+import type { SessionType } from '../types/sessions';
 
 export type FlameState = 'idle' | 'active' | 'complete' | 'error';
 
 export function useFlameState(): FlameState {
   // Select primitive records — safe selectors (reference only changes on setSessionType)
   const sessionTypes = useSessionStore((s) => s.sessionTypes);
-  const castFeedEnabled = useSessionStore((s) => s.castFeedEnabled);
 
   // Derive in hook body, not in selector
   const entries = Object.values(sessionTypes);
-  const hasClaudeSession = entries.some((e) => e.type === 'claude');
-  const hasCastSession = entries.some((e) => e.type === 'cast');
+  const AI_TYPES: SessionType[] = ['claude-code', 'aider', 'ollama', 'codex', 'open-interpreter', 'cursor-cli'];
+  const hasAiSession = entries.some((e) => AI_TYPES.includes(e.type));
 
-  if (hasCastSession && castFeedEnabled) return 'active';
-  if (hasClaudeSession) return 'active';
+  if (hasAiSession) return 'active';
   return 'idle';
 }

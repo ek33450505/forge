@@ -2,7 +2,25 @@ import { useRef } from 'react';
 import { useCwdWatch } from '../hooks/useCwdWatch';
 import { useGitStatus } from '../hooks/useGitStatus';
 import { useSessionStore } from '../store/sessions';
+import { useLayoutStore } from '../store/layout';
 import { ShortcutReference } from './ShortcutReference';
+import type { PaneNode } from '../store/layout';
+import type { SessionType } from '../types/sessions';
+
+function findSessionId(node: PaneNode | null, paneId: string | null): string | undefined {
+  if (!node || !paneId) return undefined;
+  if (node.type === 'leaf') return node.id === paneId ? node.sessionId : undefined;
+  return findSessionId(node.children[0], paneId) ?? findSessionId(node.children[1], paneId);
+}
+
+const AI_TOOL_LABELS: Partial<Record<SessionType, string>> = {
+  'claude-code':      'claude',
+  'aider':            'aider',
+  'ollama':           'ollama',
+  'codex':            'codex',
+  'open-interpreter': 'interpreter',
+  'cursor-cli':       'cursor',
+};
 
 interface StatusBarProps {
   onToggleInfoPanel: () => void;
@@ -15,6 +33,15 @@ export function StatusBar({ onToggleInfoPanel, shortcutRefOpen, onToggleShortcut
   const gitStatus = useGitStatus(cwd);
   // Direct property access — never method selectors
   const sessionCount = useSessionStore((s) => Object.keys(s.sessions).length);
+
+  // AI tool indicator: get active pane → session → type
+  const activePaneId = useLayoutStore((s) => s.activePaneId);
+  const root = useLayoutStore((s) => s.root);
+  const sessionTypes = useSessionStore((s) => s.sessionTypes);
+
+  const activeSessionId = findSessionId(root, activePaneId);
+  const activeSessionType = activeSessionId ? sessionTypes[activeSessionId]?.type : undefined;
+  const aiToolLabel = activeSessionType ? AI_TOOL_LABELS[activeSessionType] : undefined;
 
   const kbdButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -49,6 +76,13 @@ export function StatusBar({ onToggleInfoPanel, shortcutRefOpen, onToggleShortcut
         {gitStatus && (
           <span style={{ color: gitStatus.dirty ? 'var(--warning)' : 'var(--success)' }}>
             {gitStatus.dirty ? '● ' : ''}{gitStatus.branch}
+          </span>
+        )}
+
+        {/* AI tool indicator */}
+        {aiToolLabel && (
+          <span style={{ color: 'var(--accent)', fontWeight: 600 }}>
+            [{aiToolLabel}]
           </span>
         )}
 

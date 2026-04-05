@@ -122,12 +122,12 @@ export function AgentOutputPanel() {
         onScroll={handleScroll}
         style={{ flex: 1, overflowY: 'auto', paddingTop: '4px', paddingBottom: '4px' }}
       >
-        {activeType !== 'claude' && (
+        {activeType !== 'claude-code' && (
           <div style={{ padding: '16px 12px', fontSize: '11px', color: 'var(--text-muted)' }}>
-            No Claude sessions active
+            No Claude Code sessions active
           </div>
         )}
-        {activeType === 'claude' && sessionBlocks.length === 0 && (
+        {activeType === 'claude-code' && sessionBlocks.length === 0 && (
           <div style={{ padding: '16px 12px', fontSize: '11px', color: 'var(--text-muted)' }}>
             Waiting for output...
           </div>

@@ -1,36 +1,13 @@
 import { useEffect } from 'react';
 import { listen } from '@tauri-apps/api/event';
 import { useSessionStore } from '../store/sessions';
+import { ALL_DETECTORS, claudeCodeDetector } from '../lib/aiDetectors';
 import type { PtyOutputPayload } from '../types/ipc';
 
-// Patterns known to appear in Claude Code output
-const CLAUDE_PATTERNS: RegExp[] = [
-  /Claude\s+\d+\.\d+/,           // version string on startup: "Claude 3.7"
-  /<function_calls>/,             // tool use XML
-  /\btool_use\b/,
-  /\bthinking\b.*?\.\.\./,        // thinking indicator
-  /\x1b\[[0-9;]*m.*?claude/i,    // "claude" in any ANSI-colored prompt
-];
-
-// Patterns that indicate return to shell (Claude Code exited)
-const SHELL_PATTERNS: RegExp[] = [
-  /\$\s*$/m,    // trailing shell prompt $
-  /❯\s*$/m,     // zsh theme prompt
-  />\s*$/m,     // generic prompt
-];
-
-// How many consecutive shell-pattern hits before reverting from claude → shell
+// How many consecutive shell-pattern hits before reverting from an AI type → shell
 const SHELL_REVERT_THRESHOLD = 3;
 
-export function matchesClaudePattern(data: string): boolean {
-  return CLAUDE_PATTERNS.some((p) => p.test(data));
-}
-
-export function matchesShellPattern(data: string): boolean {
-  return SHELL_PATTERNS.some((p) => p.test(data));
-}
-
-export function useClaudeDetection() {
+export function useAIDetection(): void {
   const setSessionType = useSessionStore((s) => s.setSessionType);
   const getSessionType = useSessionStore((s) => s.getSessionType);
   const sessions = useSessionStore((s) => s.sessions);
@@ -42,6 +19,8 @@ export function useClaudeDetection() {
     // Per-session shell prompt hit counters for debounced revert
     const shellHits: Record<string, number> = {};
 
+    const AI_TYPES = ALL_DETECTORS.map((d) => d.tool);
+
     const unlistenPromises: Promise<() => void>[] = sessionIds.map((sessionId) =>
       listen<PtyOutputPayload>(`pty-output-${sessionId}`, ({ payload }) => {
         const current = getSessionType(sessionId);
@@ -49,16 +28,18 @@ export function useClaudeDetection() {
 
         const { data } = payload;
 
-        const matchesClaude = matchesClaudePattern(data);
-        if (matchesClaude) {
-          shellHits[sessionId] = 0;
-          setSessionType(sessionId, 'claude', false);
-          return;
+        // Run all detectors in order — first match wins
+        for (const detector of ALL_DETECTORS) {
+          if (detector.matchesOutput(data)) {
+            shellHits[sessionId] = 0;
+            setSessionType(sessionId, detector.tool, false);
+            return;
+          }
         }
 
-        // Only check shell revert if currently claude
-        if (current.type === 'claude') {
-          const matchesShell = matchesShellPattern(data);
+        // Shell revert: only if currently an AI type
+        if (AI_TYPES.includes(current.type)) {
+          const matchesShell = claudeCodeDetector.matchesShell?.(data) ?? false;
           if (matchesShell) {
             shellHits[sessionId] = (shellHits[sessionId] ?? 0) + 1;
             if (shellHits[sessionId] >= SHELL_REVERT_THRESHOLD) {

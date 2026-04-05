@@ -1,69 +1,89 @@
 import { describe, it, expect } from 'vitest';
-import type { SessionTypeEntry } from '../types/sessions';
+import type { SessionType, SessionTypeEntry } from '../types/sessions';
 
 // Test the pure derivation logic independently of React hooks/DOM
 // This avoids jsdom dependency while covering the core state machine
 
 type MockSessionTypes = Record<string, SessionTypeEntry>;
 
+const AI_TYPES: SessionType[] = ['claude-code', 'aider', 'ollama', 'codex', 'open-interpreter', 'cursor-cli'];
+
 function deriveFlameState(
   sessionTypes: MockSessionTypes,
-  castFeedEnabled: boolean,
 ): 'idle' | 'active' | 'complete' | 'error' {
   const entries = Object.values(sessionTypes);
-  const hasClaudeSession = entries.some((e) => e.type === 'claude');
-  const hasCastSession = entries.some((e) => e.type === 'cast');
+  const hasAiSession = entries.some((e) => AI_TYPES.includes(e.type));
 
-  if (hasCastSession && castFeedEnabled) return 'active';
-  if (hasClaudeSession) return 'active';
+  if (hasAiSession) return 'active';
   return 'idle';
 }
 
 describe('useFlameState derivation logic', () => {
   it('returns idle when no sessions', () => {
-    expect(deriveFlameState({}, false)).toBe('idle');
+    expect(deriveFlameState({})).toBe('idle');
   });
 
   it('returns idle when only shell sessions', () => {
     const sessionTypes: MockSessionTypes = {
       'session-1': { type: 'shell', manualOverride: false },
     };
-    expect(deriveFlameState(sessionTypes, false)).toBe('idle');
+    expect(deriveFlameState(sessionTypes)).toBe('idle');
   });
 
-  it('returns active when a claude session exists', () => {
+  it('returns active when a claude-code session exists', () => {
     const sessionTypes: MockSessionTypes = {
-      'session-1': { type: 'claude', manualOverride: true },
+      'session-1': { type: 'claude-code', manualOverride: true },
     };
-    expect(deriveFlameState(sessionTypes, false)).toBe('active');
+    expect(deriveFlameState(sessionTypes)).toBe('active');
   });
 
-  it('returns active when cast session exists and castFeedEnabled', () => {
+  it('returns active when an aider session exists', () => {
     const sessionTypes: MockSessionTypes = {
-      'session-1': { type: 'cast', manualOverride: false },
+      'session-1': { type: 'aider', manualOverride: false },
     };
-    expect(deriveFlameState(sessionTypes, true)).toBe('active');
+    expect(deriveFlameState(sessionTypes)).toBe('active');
   });
 
-  it('returns idle when cast session exists but castFeedEnabled is false', () => {
+  it('returns active when an ollama session exists', () => {
     const sessionTypes: MockSessionTypes = {
-      'session-1': { type: 'cast', manualOverride: false },
+      'session-1': { type: 'ollama', manualOverride: false },
     };
-    expect(deriveFlameState(sessionTypes, false)).toBe('idle');
+    expect(deriveFlameState(sessionTypes)).toBe('active');
   });
 
-  it('returns active when multiple sessions and one is claude', () => {
+  it('returns active when a codex session exists', () => {
+    const sessionTypes: MockSessionTypes = {
+      'session-1': { type: 'codex', manualOverride: false },
+    };
+    expect(deriveFlameState(sessionTypes)).toBe('active');
+  });
+
+  it('returns active when an open-interpreter session exists', () => {
+    const sessionTypes: MockSessionTypes = {
+      'session-1': { type: 'open-interpreter', manualOverride: false },
+    };
+    expect(deriveFlameState(sessionTypes)).toBe('active');
+  });
+
+  it('returns active when a cursor-cli session exists', () => {
+    const sessionTypes: MockSessionTypes = {
+      'session-1': { type: 'cursor-cli', manualOverride: false },
+    };
+    expect(deriveFlameState(sessionTypes)).toBe('active');
+  });
+
+  it('returns active when multiple sessions and one is claude-code', () => {
     const sessionTypes: MockSessionTypes = {
       'session-1': { type: 'shell', manualOverride: false },
-      'session-2': { type: 'claude', manualOverride: true },
+      'session-2': { type: 'claude-code', manualOverride: true },
     };
-    expect(deriveFlameState(sessionTypes, false)).toBe('active');
+    expect(deriveFlameState(sessionTypes)).toBe('active');
   });
 
   it('returns idle when only unknown sessions', () => {
     const sessionTypes: MockSessionTypes = {
       'session-1': { type: 'unknown', manualOverride: false },
     };
-    expect(deriveFlameState(sessionTypes, false)).toBe('idle');
+    expect(deriveFlameState(sessionTypes)).toBe('idle');
   });
 });
