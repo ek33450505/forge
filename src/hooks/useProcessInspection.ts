@@ -1,9 +1,32 @@
 import { useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { useSessionStore } from '../store/sessions';
+import type { SessionType } from '../types/sessions';
 
 const POLL_INTERVAL_MS = 2000;
-const CLAUDE_PROCESS_NAMES = ['claude', 'node']; // 'node' catches claude code's node subprocess
+
+const PROCESS_TOOL_MAP: Record<string, SessionType> = {
+  claude:          'claude-code',
+  node:            'claude-code',  // Claude Code runs as Node subprocess
+  aider:           'aider',
+  ollama:          'ollama',
+  codex:           'codex',
+  interpreter:     'open-interpreter',
+  'cursor-agent':  'cursor-cli',
+};
+
+/**
+ * Pure helper — exported for testability.
+ * Maps a foreground process name to a SessionType using partial, case-insensitive
+ * matching against PROCESS_TOOL_MAP keys. Returns 'shell' when no key matches.
+ */
+export function detectToolFromProcessName(processName: string): SessionType {
+  const lower = processName.toLowerCase();
+  for (const [key, tool] of Object.entries(PROCESS_TOOL_MAP)) {
+    if (lower.includes(key)) return tool;
+  }
+  return 'shell';
+}
 
 export function useProcessInspection() {
   const setSessionType = useSessionStore((s) => s.setSessionType);
@@ -22,12 +45,9 @@ export function useProcessInspection() {
 
         void invoke<string>('get_foreground_process', { sessionId })
           .then((processName) => {
-            const isClaudeProcess = CLAUDE_PROCESS_NAMES.some(
-              (name) => processName.toLowerCase().includes(name)
-            );
             setSessionType(
               sessionId,
-              isClaudeProcess ? 'claude-code' : 'shell',
+              detectToolFromProcessName(processName),
               false
             );
           })
