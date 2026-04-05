@@ -317,6 +317,7 @@ function App() {
   );
 
   const feedOpen = useCastStore((s) => s.feedOpen);
+  const agentOutputOpen = useAgentOutputStore((s) => s.panelOpen);
 
   useKeyboardShortcuts(handleNewTab, handleSplit, handleToggleSidebar, handleToggleInfoPanel, handleToggleShortcutRef, handleToggleCommandPalette, handleToggleSettings);
   useProcessInspection();
@@ -372,7 +373,7 @@ function App() {
           {ready && <PaneLayout />}
         </div>
         {feedOpen && <AgentFeed />}
-        <AgentOutputPanel />
+        {agentOutputOpen && <AgentOutputPanel />}
         <InfoPanel open={infoPanelOpen} onClose={handleToggleInfoPanel} />
       </div>
 
