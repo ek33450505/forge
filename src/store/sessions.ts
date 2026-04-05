@@ -6,7 +6,6 @@ import type { SessionType, SessionTypeEntry } from '../types/sessions';
 interface SessionState {
   sessions: Record<string, SessionInfo>;
   sessionTypes: Record<string, SessionTypeEntry>;
-  castFeedEnabled: boolean;
 
   addSession: (info: SessionInfo) => void;
   removeSession: (id: string) => void;
@@ -16,13 +15,11 @@ interface SessionState {
 
   setSessionType: (id: string, type: SessionType, manual: boolean) => void;
   getSessionType: (id: string) => SessionTypeEntry;
-  setCastFeedEnabled: (enabled: boolean) => void;
 }
 
 export const useSessionStore = create<SessionState>()((set, get) => ({
   sessions: {},
   sessionTypes: {},
-  castFeedEnabled: false,
 
   addSession(info) {
     set((state) => ({
@@ -84,7 +81,4 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
     return get().sessionTypes[id] ?? { type: 'unknown', manualOverride: false };
   },
 
-  setCastFeedEnabled(enabled) {
-    set({ castFeedEnabled: enabled });
-  },
 }));

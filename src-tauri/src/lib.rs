@@ -1,4 +1,3 @@
-mod cast;
 mod config;
 mod cwd;
 mod git;
@@ -35,9 +34,6 @@ pub fn run() {
             process::get_foreground_process,
             cwd::get_cwd,
             git::get_git_status,
-            cast::cast_detect,
-            cast::cast_query_recent_runs,
-            cast::cast_query_stats,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

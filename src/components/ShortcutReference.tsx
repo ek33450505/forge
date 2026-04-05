@@ -31,8 +31,6 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { key: '⌘,',   label: 'Settings' },
       { key: '⌘/',   label: 'Keyboard shortcuts' },
       { key: '⌘I',   label: 'Info panel' },
-      { key: '⌘⇧O',  label: 'Agent output panel' },
-      { key: '⌘⇧A',  label: 'Toggle CAST feed' },
     ],
   },
   {
