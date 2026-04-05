@@ -2,8 +2,6 @@ import { useRef } from 'react';
 import { useCwdWatch } from '../hooks/useCwdWatch';
 import { useGitStatus } from '../hooks/useGitStatus';
 import { useSessionStore } from '../store/sessions';
-import { CastStatsBar } from './CastStatsBar';
-import { TokenMeter } from './TokenMeter';
 import { ShortcutReference } from './ShortcutReference';
 
 interface StatusBarProps {
@@ -53,12 +51,6 @@ export function StatusBar({ onToggleInfoPanel, shortcutRefOpen, onToggleShortcut
             {gitStatus.dirty ? '● ' : ''}{gitStatus.branch}
           </span>
         )}
-
-        {/* Token meter */}
-        <TokenMeter />
-
-        {/* CAST stats */}
-        <CastStatsBar />
 
         <span style={{ flex: 1 }} />
 

@@ -1,7 +1,5 @@
 import { useEffect } from 'react';
 import { useLayoutStore } from '../store/layout';
-import { useCastStore } from '../store/cast';
-import { useAgentOutputStore } from '../store/agentOutput';
 import { useTerminalSearchStore } from '../store/terminalSearch';
 
 export function useKeyboardShortcuts(
@@ -79,21 +77,6 @@ export function useKeyboardShortcuts(
       if (e.metaKey && !e.shiftKey && e.key === ',') {
         e.preventDefault();
         onToggleSettings?.();
-      }
-
-      // Cmd+Shift+O — toggle Agent Output panel
-      if (e.metaKey && e.shiftKey && (e.key === 'o' || e.key === 'O')) {
-        e.preventDefault();
-        useAgentOutputStore.getState().togglePanel();
-      }
-
-      // Cmd+Shift+A — toggle CAST agent feed
-      if (e.metaKey && e.shiftKey && (e.key === 'a' || e.key === 'A')) {
-        e.preventDefault();
-        const castState = useCastStore.getState();
-        if (castState.available) {
-          castState.setFeedOpen(!castState.feedOpen);
-        }
       }
 
       // Cmd+1 through Cmd+9 — switch to pane by index (within active tab)

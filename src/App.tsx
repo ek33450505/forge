@@ -12,19 +12,11 @@ import { useLayoutStore } from './store/layout';
 import { useSessionStore } from './store/sessions';
 import { useCommandHistoryStore } from './store/commandHistory';
 import { useTerminalSearchStore } from './store/terminalSearch';
-import { useNotificationSettingsStore } from './store/notificationSettings';
 import { overwriteCommand, type Command as ForgeCommand } from './lib/commands';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useProcessInspection } from './hooks/useProcessInspection';
 import { useClaudeDetection } from './hooks/useClaudeDetection';
-import { useCastFeed } from './hooks/useCastFeed';
-import { useCastData } from './hooks/useCastData';
-import { useCastStore } from './store/cast';
-import { AgentFeed } from './components/AgentFeed';
 import { TabBar } from './components/TabBar';
-import { AgentOutputPanel } from './components/AgentOutputPanel';
-import { useAgentOutput } from './hooks/useAgentOutput';
-import { useAgentOutputStore } from './store/agentOutput';
 import { useTheme } from './hooks/useTheme';
 import { loadForgeConfig } from './hooks/useForgeConfig';
 import { useThemeStore } from './store/theme';
@@ -65,9 +57,6 @@ function App() {
         if (cfg.theme) useThemeStore.getState().setTheme(cfg.theme);
         if (cfg.fontFamily) useThemeStore.getState().setFontFamily(cfg.fontFamily);
         if (cfg.fontSize) useThemeStore.getState().setFontSize(cfg.fontSize);
-
-        // Initialize CAST detection and data
-        void useCastStore.getState().initialize();
 
         const sessionId = await invoke<string>('pty_create', {
           shell: '/bin/zsh',
@@ -249,24 +238,6 @@ function App() {
       handler: () => { setSettingsPanelOpen(true); },
     });
     overwriteCommand({
-      id: 'toggle-agent-output',
-      label: 'Toggle Agent Output Panel',
-      group: 'Layout',
-      keybind: '⌘⇧O',
-      handler: () => { useAgentOutputStore.getState().togglePanel(); },
-    });
-    overwriteCommand({
-      id: 'cast.toggle-feed',
-      label: 'Toggle CAST Agent Feed',
-      group: 'CAST',
-      keywords: ['cast', 'agents', 'feed', 'activity'],
-      keybind: '⌘⇧A',
-      handler: () => {
-        const store = useCastStore.getState();
-        if (store.available) store.setFeedOpen(!store.feedOpen);
-      },
-    });
-    overwriteCommand({
       id: 'search-terminal',
       label: 'Search Terminal Output',
       group: 'Terminal',
@@ -281,28 +252,6 @@ function App() {
       keywords: ['keyboard', 'shortcuts', 'help', 'bindings', 'hotkeys'],
       handler: () => { setShortcutRefOpen((prev) => !prev); },
     });
-    overwriteCommand({
-      id: 'toggle-completion-notify',
-      label: 'Toggle Completion Notification (this pane)',
-      group: 'Terminal',
-      handler: () => {
-        const id = useLayoutStore.getState().activePaneId;
-        if (id) useNotificationSettingsStore.getState().togglePane(id);
-      },
-    });
-    overwriteCommand({
-      id: 'cast.refresh',
-      label: 'Refresh CAST Data',
-      group: 'CAST',
-      keywords: ['cast', 'refresh', 'reload'],
-      handler: () => {
-        const store = useCastStore.getState();
-        if (store.available) {
-          void store.refreshRuns();
-          void store.refreshStats();
-        }
-      },
-    });
   }, [handleNewTab, handleSplit]);
 
   const handleExecuteCommand = useCallback(
@@ -316,15 +265,9 @@ function App() {
     [],
   );
 
-  const feedOpen = useCastStore((s) => s.feedOpen);
-  const agentOutputOpen = useAgentOutputStore((s) => s.panelOpen);
-
   useKeyboardShortcuts(handleNewTab, handleSplit, handleToggleSidebar, handleToggleInfoPanel, handleToggleShortcutRef, handleToggleCommandPalette, handleToggleSettings);
   useProcessInspection();
   useClaudeDetection();
-  useCastFeed();
-  useCastData();
-  useAgentOutput();
 
   return (
     <div
@@ -372,8 +315,6 @@ function App() {
           />
           {ready && <PaneLayout />}
         </div>
-        {feedOpen && <AgentFeed />}
-        {agentOutputOpen && <AgentOutputPanel />}
         <InfoPanel open={infoPanelOpen} onClose={handleToggleInfoPanel} />
       </div>
 
